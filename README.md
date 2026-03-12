@@ -17,6 +17,7 @@ The repository focuses on:
 The original assessment brief provided by NALA is included for reference.
 
 See: `assessment/nala_assessment_instructions.pdf`
+
 [NALA Assessment Instructions](assessment/senior_ae_take_home.pdf)
 
 This repository contains my proposed analytics architecture, dbt project structure, and documentation addressing the requirements outlined in the brief.
@@ -39,9 +40,11 @@ Marts Layer
    ▼
 Semantic Layer
 
-## Repository Structure
+---
 
-```
+# Repository Structure
+
+
 nala-analytics-assessment
 │
 ├── README.md
@@ -68,7 +71,6 @@ nala-analytics-assessment
     ├── tests
     ├── seeds
     └── macros
-```
 
 ---
 
@@ -129,8 +131,3 @@ The project is intentionally **not runnable** because:
 - The objective of the assessment is to evaluate architecture, modelling, and documentation rather than executable pipelines.
 
 All models are written as they would appear in a **production dbt project**.
-
-
-
-
-
