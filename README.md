@@ -152,6 +152,7 @@ The repository focuses on:
 The original assessment brief provided by NALA is included for reference.
 
 See: `assessment/nala_assessment_instructions.pdf`
+[NALA Assessment Instructions](assessment/nala_assessment_instructions.pdf)
 
 This repository contains my proposed analytics architecture, dbt project structure, and documentation addressing the requirements outlined in the brief.
 
@@ -235,4 +236,9 @@ The project is intentionally **not runnable** because:
 All models are written as they would appear in a **production dbt project**.
 
 
+<<<<<<< HEAD
 >>>>>>> e4cd8bc (Update README.md)
+=======
+
+
+>>>>>>> 050433c (Update README.md)
