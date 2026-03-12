@@ -21,10 +21,9 @@ See: `assessment/nala_assessment_instructions.pdf`
 This repository contains my proposed analytics architecture, dbt project structure, and documentation addressing the requirements outlined in the brief.
 
 
----
+## Repository Structure
 
-# Repository Structure
-
+```
 nala-analytics-assessment
 │
 ├── README.md
@@ -51,8 +50,7 @@ nala-analytics-assessment
     ├── tests
     ├── seeds
     └── macros
-
-
+```
 
 ---
 
@@ -100,4 +98,5 @@ The project is intentionally **not runnable** because:
 - The objective of the assessment is to evaluate architecture, modelling, and documentation rather than executable pipelines.
 
 All models are written as they would appear in a **production dbt project**.
+
 
