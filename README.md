@@ -20,6 +20,23 @@ See: `assessment/nala_assessment_instructions.pdf`
 
 This repository contains my proposed analytics architecture, dbt project structure, and documentation addressing the requirements outlined in the brief.
 
+## High-Level Architecture
+
+The analytics layer follows a layered transformation architecture:
+
+Raw Sources
+   │
+   ▼
+Staging Layer
+   │
+   ▼
+Intermediate Layer
+   │
+   ▼
+Marts Layer
+   │
+   ▼
+Semantic Layer
 
 ## Repository Structure
 
@@ -53,6 +70,19 @@ nala-analytics-assessment
 ```
 
 ---
+
+## Key Data Sources
+
+The architecture integrates three primary operational systems:
+
+• **Backend Transaction System**
+Core payments, users, transfers, and disbursements.
+
+• **Fincrime Platform**
+Fraud detection workflows, task queues, and rule evaluations.
+
+• **Amplitude**
+Product analytics events used for exploratory behavioural analysis.
 
 # Mapping to Assessment Requirements
 
@@ -98,5 +128,6 @@ The project is intentionally **not runnable** because:
 - The objective of the assessment is to evaluate architecture, modelling, and documentation rather than executable pipelines.
 
 All models are written as they would appear in a **production dbt project**.
+
 
 
