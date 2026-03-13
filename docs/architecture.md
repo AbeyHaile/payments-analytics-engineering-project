@@ -20,13 +20,13 @@ The architecture prioritises:
 The analytics platform integrates data from three primary operational systems:
 
 ### Backend Transaction System
-Core payments infrastructure containing users, transactions, transfers and disbursements.
+Core payments infrastructure containing users, transactions, transfers and disbursements (Ops).
 
 ### Fincrime Platform
-Risk and fraud detection workflows including rule execution results and operational review tasks.
+Risk and fraud detection workflows including rule execution results and operational review tasks (Ops). 
 
 ### Amplitude
-Product analytics events used for exploratory behavioural analysis such as onboarding and engagement.
+Product analytics events used for exploratory behavioural analysis such as onboarding and engagement (Analytics).
 
 Data from these systems is assumed to be ingested into **Snowflake** through existing ingestion pipelines.
 
@@ -198,3 +198,4 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
