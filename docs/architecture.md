@@ -50,8 +50,6 @@ Raw ingestion layer → staging → intermediate → marts → semantic layer.
 
 ## 4. dbt Layering Philosophy
 
-## Layering Philosophy
-
 The transformation layer follows a three-tier dbt structure:
 
 **staging → intermediate → mart**
@@ -218,6 +216,7 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
 
