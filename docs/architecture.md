@@ -46,12 +46,12 @@ This preserves clear lineage.
 
 Staging models follow the naming convention:
 
-`stg__<source_system>_<entity>`
+`stg_<source_system>__<entity>`
 
 Examples:
 
-- `stg__backend_transactions`
-- `stg__fincrime_rule_executions`
+- `stg_backend__transactions`
+- `stg_fincrime__rule_executions`
 
 The intermediate layer contains reusable transformations  
 and cross-system enrichments.
@@ -216,6 +216,7 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
 
