@@ -55,12 +55,31 @@ The dbt project follows a layered transformation architecture:
 **Staging → Intermediate → Marts → Semantic**
 
 ### Staging Layer
-Standardises raw source tables and performs minimal transformations such as:
 
-- Column renaming
-- Type casting
-- Basic filtering
-- Source system normalisation
+The staging layer standardises raw source tables and provides a clean, consistent interface for downstream transformations.
+
+Staging models apply only minimal transformations while preserving the original grain of the source data.
+
+Typical transformations include:
+
+- Column renaming to follow consistent naming conventions
+- Type casting and timestamp normalization
+- Basic filtering of invalid records where necessary
+- Source system normalization
+
+Each staging model represents a single upstream entity and maintains a one-to-one relationship with the source table.
+
+Naming follows the convention:
+
+`stg_<source_system>__<entity>`
+
+Examples:
+
+- `stg_backend__users`
+- `stg_fincrime__rule_executions`
+- `stg_amplitude__events`
+
+This naming pattern clearly identifies the transformation layer, source system, and underlying business entity.
 
 ### Intermediate Layer
 Contains reusable business logic and joins across systems.
@@ -198,6 +217,7 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
 
