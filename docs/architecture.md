@@ -28,8 +28,7 @@ Risk and fraud detection workflows including rule execution results and operatio
 ### Amplitude
 Product analytics events used for exploratory behavioural analysis such as onboarding and engagement. (Analytics)
 
-Data from these systems is assumed to be ingested into **Snowflake** through existing ingestion pipelines.
-
+For the purposes of this assessment, raw data from these systems is assumed to be available in Snowflake in source-aligned schemas before dbt transformations begin. The ingestion mechanism itself is treated as upstream and outside the scope of this submission.
 ---
 
 ## 3. Snowflake Warehouse Provisioning
@@ -198,5 +197,6 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
