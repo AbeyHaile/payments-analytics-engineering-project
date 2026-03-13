@@ -32,23 +32,7 @@ For the purposes of this assessment, raw data from these systems is assumed to b
 
 ---
 
-## 3. Snowflake Warehouse Provisioning
-
-The Snowflake environment is structured to support both ingestion and analytical workloads.
-
-Typical components include:
-
-- Raw data ingestion schemas
-- Analytics transformation schemas
-- Dedicated virtual warehouses for transformation workloads
-
-Example logical structure:
-
-Raw ingestion layer → staging → intermediate → marts → semantic layer.
-
----
-
-## 4. dbt Layering Philosophy
+## 3. dbt Layer Philosophy
 
 The transformation layer follows a three-tier dbt structure:
 
@@ -98,6 +82,22 @@ This structure separates:
 
 The separation improves maintainability and makes lineage easier to follow  
 from raw data to analytical outputs.
+
+---
+
+## 4. Snowflake Warehouse Provisioning
+
+The Snowflake environment is structured to support both ingestion and analytical workloads.
+
+Typical components include:
+
+- Raw data ingestion schemas
+- Analytics transformation schemas
+- Dedicated virtual warehouses for transformation workloads
+
+Example logical structure:
+
+Raw ingestion layer → staging → intermediate → marts → semantic layer.
 
 ---
 
@@ -216,6 +216,7 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
 
