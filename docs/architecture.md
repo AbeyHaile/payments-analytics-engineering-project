@@ -77,8 +77,7 @@ and cross-system enrichments.
 Examples include linking transactions to fincrime workflows, extracting identifiers from JSON context 
 fields, and building reusable enrichment models.
 
-*Centralising this logic prevents duplication and ensures business rules remain consistent  
-across downstream analytical models.*
+*Centralising this logic prevents duplication and ensures business rules remain consistent across downstream analytical models.*
 
 The mart layer contains business-facing datasets aligned to the assessment use cases.
 These models typically follow dimensional modelling principles and include:
@@ -219,6 +218,7 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
 
