@@ -50,51 +50,56 @@ Raw ingestion layer → staging → intermediate → marts → semantic layer.
 
 ## 4. dbt Layering Philosophy
 
-The dbt project follows a layered transformation architecture:
+## Layering Philosophy
 
-**Staging → Intermediate → Marts → Semantic**
+The transformation layer follows a three-tier dbt structure:
 
-### Staging Layer
+**staging → intermediate → mart**
 
-Staging models apply only minimal transformations while preserving the original grain of the source data.
+The staging layer is organised by source system  
+(backend, fincrime, amplitude).
 
-Typical transformations include:
+Each staging model standardises a single upstream entity and maintains a one-to-one relationship with the source table.  
+This preserves clear lineage.
 
-- Column renaming to follow consistent naming conventions
-- Type casting and timestamp normalization
-- Basic filtering of invalid records where necessary
-- Source system normalization
-
-Each staging model represents a single upstream entity and maintains a one-to-one relationship with the source table.
-
-Naming follows the convention:
+Staging models follow the naming convention:
 
 `stg_<source_system>__<entity>`
 
 Examples:
 
-- `stg_backend__users`
+- `stg_backend__transactions`
 - `stg_fincrime__rule_executions`
-- `stg_amplitude__events`
 
-### Intermediate Layer
-Contains reusable business logic and joins across systems.
+The intermediate layer contains reusable transformations  
+and cross-system enrichments.
 
-Examples include:
+Examples include linking transactions to fincrime workflows, extracting identifiers from JSON context 
+fields, and building reusable enrichment models.
 
-- Transaction enrichment
-- Fincrime workflow processing
-- Context JSON extraction
+Centralising this logic prevents duplication and ensures business rules remain consistent across downstream analytical models.
 
-### Marts Layer
-Analytics-ready datasets designed around business entities such as:
+The mart layer contains business-facing datasets aligned to the assessment use cases.
+These models typically follow dimensional modelling principles and include:
 
-- Transaction reporting
-- Disbursement operations
-- Fincrime operational monitoring
+- fact tables capturing business events
+- dimension tables providing descriptive context
 
-### Semantic Layer
-Defines business metrics and exposes them to downstream analytics tools.
+Marts support areas such as:
+
+- transaction reporting
+- disbursement operations
+- fincrime monitoring
+- exploratory onboarding and engagement analysis
+
+This structure separates:
+
+- source standardisation
+- reusable transformation logic
+- business-facing analytical models
+
+The separation improves maintainability and makes lineage easier to follow  
+from raw data to analytical outputs.
 
 ---
 
@@ -213,6 +218,7 @@ Examples include:
 - Event schemas are reasonably consistent
 
 These assumptions allow the architecture to focus on the transformation and modelling layers.
+
 
 
 
