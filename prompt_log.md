@@ -101,27 +101,7 @@ This document records the substantive AI prompts used to support the completion 
 - Reinforced a dbt-first workflow: sources → staging SQL → model YAML → downstream layers
 - Helped prioritise the backend, fincrime, and amplitude staging models before moving to marts and semantic definitions
 
-## 9. README Quality Review
-
-**Prompt**
-> Current status review
-
-Your current **AI Prompt Log is already good**, but for an assessment it should show three things clearly:
-
-1. **AI was used as an assistant, not as the author**
-2. **Prompts were task-specific**
-3. **You verified outputs against the assessment document**
-
-Right now your log focuses mostly on **documentation prompts**, but most of the real AI assistance happened during:
-
-* **dbt staging model generation**
-* **YAML schema creation**
-* **scheduling strategy**
-* **data validation rules**
-
----
-
-### 10. Staging Model Generation
+### 9. Staging Model Generation
 
 **Prompt**
 
@@ -142,7 +122,7 @@ Right now your log focuses mostly on **documentation prompts**, but most of the 
 
 ---
 
-### 11. YAML Schema Documentation
+### 10. YAML Schema Documentation
 
 **Prompt**
 
@@ -161,7 +141,7 @@ Right now your log focuses mostly on **documentation prompts**, but most of the 
 
 ---
 
-### 12. Relationship Identification
+### 11. Relationship Identification
 
 **Prompt**
 
@@ -175,7 +155,7 @@ Right now your log focuses mostly on **documentation prompts**, but most of the 
 
 ---
 
-### 13. Scheduling Strategy
+### 12. Scheduling Strategy
 
 **Prompt**
 
@@ -189,7 +169,7 @@ Right now your log focuses mostly on **documentation prompts**, but most of the 
 
 ---
 
-### 14. Scheduling Validation Using Table Volumes
+### 13. Scheduling Validation Using Table Volumes
 
 **Prompt**
 
@@ -203,7 +183,7 @@ Right now your log focuses mostly on **documentation prompts**, but most of the 
 
 ---
 
-### 15. Data Quality Review
+### 14. Data Quality Review
 
 **Prompt**
 
