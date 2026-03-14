@@ -119,8 +119,6 @@ Right now your log focuses mostly on **documentation prompts**, but most of the 
 * **scheduling strategy**
 * **data validation rules**
 
-You should add those. Below are **additional entries that are strictly tied to the task work**.
-
 ---
 
 ### 10. Staging Model Generation
