@@ -1,22 +1,44 @@
-# Architecture Document: NALA Payments Analytics
+# Architecture Document
 
 ## 1. Overview
 
-This document outlines the analytics architecture designed to transform raw backend, Fincrime, and Amplitude data into a governed, consumption-ready layer in Snowflake. The design prioritizes **idempotency**, **auditability**, and **semantic consistency** to support both human stakeholders and AI agents.
+
+This document outlines the analytics architecture designed to transform raw backend, Fincrime, and Amplitude data into a governed, consumption-ready layer in Snowflake.
+
+The design prioritizes:
+- **Idempotency**
+- **Auditability**
+- **Semantic consistency**
+
+This ensures the platform supports both **human stakeholders** and **AI agents**.
 
 ## 2. Snowflake Provisioning & Role Hierarchy
 
-* **Databases:**
-* `RAW`: Ingestion point for CDC (Backend/Fincrime) and Batch (Amplitude) data.
-* `ANALYTICS`: Primary transformation and consumption database.
+### Databases
 
+- `RAW`  
+  Ingestion layer for CDC (Backend/Fincrime) and batch (Amplitude) data
 
-* **Warehouses:**
-* `DBT_TRANSFORM_WH`: X-Small (Standard) for routine runs; optimized for cost.
-* `REPORTING_WH`: Multi-cluster enabled to handle concurrent BI and Semantic Layer queries.
+- `ANALYTICS`  
+  Primary transformation and consumption layer
 
+### Warehouses
 
-* **Roles:** Functional roles (`LOADER`, `TRANSFORMER`, `REPORTING`) ensure a "least-privilege" security model.
+- `DBT_TRANSFORM_WH`  
+  X-Small (Standard) for routine transformations, optimized for cost
+
+- `REPORTING_WH`  
+  Multi-cluster warehouse to support concurrent BI and Semantic Layer workloads
+
+### Roles
+
+Functional roles enforce a **least-privilege model**:
+
+- `LOADER`
+- `TRANSFORMER`
+- `REPORTING`
+
+---
 
 ## 3. dbt Layering & Materialization Strategy
 
