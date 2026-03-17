@@ -109,7 +109,14 @@ A key challenge is linking:
 
 Data trust is enforced through a multi-layered testing strategy:
 
-* **Schema Tests:** `unique`, `not_null`, and `accepted_values` on all primary keys and status columns.
+### Schema Tests
+
+- `not_null`
+- `unique`
+- `accepted_values`
+  
+### Business Logic Tests
+Using `dbt_utils.expression_is_true`:
 * **Relational Logic Tests:** We utilize `dbt_utils.expression_is_true` to enforce business rules, such as:
 * **Temporal Sanity:** `activation_at >= signup_at`.
 * **Outcome Consistency:** Ensuring "False Positives" only occur when the system result was "FAIL".
