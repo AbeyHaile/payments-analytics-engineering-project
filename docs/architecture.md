@@ -1,232 +1,86 @@
-# Architecture Document
+Here is the finalized, senior-level **Architecture Document** in Markdown format. This version is specifically tailored to the NALA assessment requirements, emphasizing the "why" behind your engineering choices.
+
+---
+
+# Architecture Document: NALA Payments Analytics
 
 ## 1. Overview
 
-This document describes the proposed analytics architecture for the NALA Analytics Engineering assessment.  
-The goal is to design a scalable transformation layer using **Snowflake and dbt**, integrating multiple operational data sources and exposing reliable metrics through a semantic layer.
+This document outlines the analytics architecture designed to transform raw backend, Fincrime, and Amplitude data into a governed, consumption-ready layer in Snowflake. The design prioritizes **idempotency**, **auditability**, and **semantic consistency** to support both human stakeholders and AI agents.
 
-The architecture prioritises:
+## 2. Snowflake Provisioning & Role Hierarchy
 
-- Clear separation of transformation layers
-- Maintainable dbt models
-- Reusable business logic
-- Strong documentation and testing practices
-- A semantic layer exposing trusted metrics
+* **Databases:**
+* `RAW`: Ingestion point for CDC (Backend/Fincrime) and Batch (Amplitude) data.
+* `ANALYTICS`: Primary transformation and consumption database.
 
----
 
-## 2. Source Systems and Ingestion Pattern
+* **Warehouses:**
+* `DBT_TRANSFORM_WH`: X-Small (Standard) for routine runs; optimized for cost.
+* `REPORTING_WH`: Multi-cluster enabled to handle concurrent BI and Semantic Layer queries.
 
-The analytics platform integrates data from three primary operational systems:
 
-### Backend Transaction System
-Core payments infrastructure containing users, transactions, transfers and disbursements. (Ops)
+* **Roles:** Functional roles (`LOADER`, `TRANSFORMER`, `REPORTING`) ensure a "least-privilege" security model.
 
-### Fincrime Platform
-Risk and fraud detection workflows including rule execution results and operational review tasks. (Ops)
+## 3. dbt Layering & Materialization Strategy
 
-### Amplitude
-Product analytics events used for exploratory behavioural analysis such as onboarding and engagement. (Analytics) 
+The project follows a modular, three-tier dbt structure:
 
-For the purposes of this assessment, raw data from these systems is assumed to be available in Snowflake in source-aligned schemas before dbt transformations begin. The ingestion mechanism itself is treated as upstream and outside the scope of this submission.
+| Layer | Materialization | Rationale |
+| --- | --- | --- |
+| **Staging** | `view` | Renaming, casting, and initial CDC deduplication. |
+| **Intermediate** | `view` / `ephemeral` | Complex joins and cross-source entity resolution (e.g., Task-to-Workflow mapping). |
+| **Marts** | `incremental` | Aggregated, stakeholder-facing tables optimized for performance. |
 
----
+### 3.1 Incremental Strategy: `delete+insert`
 
-## 3. dbt Layer Philosophy
+For all performance marts (Fincrime, Ops, and Finance), we utilize the **`delete+insert` strategy** with a **3-day lookback window**.
 
-The transformation layer follows a three-tier dbt structure:
+* **Logic:** Fintech operations are often asynchronous. A transaction or task created on Day 1 may only reach a terminal state (Resolved/Failed) on Day 3.
+* **Implementation:** We use `get_max_of_table_column` to identify the high-water mark and subtract 3 days to re-process potentially updated records, ensuring 100% data accuracy without full table scans.
 
-**staging → intermediate → mart**
+## 4. Data Integrity & Surrogate Keys
 
-The staging layer is organised by source system  
-(backend, fincrime, amplitude).
+To support idempotent loading and high-performance joins, every Mart model utilizes a deterministic **Surrogate Key (`kpi_report_pk`)**.
 
-Each staging model standardises a single upstream entity and maintains a one-to-one relationship with the source table.  
-This preserves clear lineage.
+* **Method:** `HASH()` of the aggregation grain (e.g., `date`, `provider`, `corridor`).
+* **Benefits:** 1.  Ensures a single `unique_key` for dbt incremental logic.
+2.  Provides a singular "handle" for debugging data collisions.
+3.  Optimizes Snowflake's join engine compared to multi-column joins.
 
-Staging models follow the naming convention:
+## 5. Cross-Source Enrichment (Requirement 4)
 
-`stg_<source_system>__<entity>`
+The mapping between **Fincrime Workflows** and **Backend Tasks** is a core challenge addressed in the Intermediate layer.
 
-Examples:
+* **Entity Resolution:** We extract polymorphic identifiers (Transaction IDs vs. User IDs) from JSON metadata to link manual human actions in the Backend to the automated triggers in the Fincrime system.
+* **Join Logic:** We prioritize Transaction-level matches over User-level matches using `QUALIFY ROW_NUMBER()` to ensure the most granular correlation is preserved.
 
-- `stg_backend__transactions`
-- `stg_fincrime__rule_executions`
+## 6. Testing & Quality Standards
 
-The intermediate layer contains reusable transformations  
-and cross-system enrichments.
+Data trust is enforced through a multi-layered testing strategy:
 
-Examples include linking transactions to fincrime workflows, extracting identifiers from JSON context 
-fields, and building reusable enrichment models.
+* **Schema Tests:** `unique`, `not_null`, and `accepted_values` on all primary keys and status columns.
+* **Relational Logic Tests:** We utilize `dbt_utils.expression_is_true` to enforce business rules, such as:
+* **Temporal Sanity:** `activation_at >= signup_at`.
+* **Outcome Consistency:** Ensuring "False Positives" only occur when the system result was "FAIL".
 
-*Centralising this logic prevents duplication and ensures business rules remain consistent across downstream analytical models.*
 
-The mart layer contains business-facing datasets aligned to the assessment use cases.
-These models typically follow dimensional modelling principles and include:
 
-- fact tables capturing business events
-- dimension tables providing descriptive context
+## 7. Semantic Layer (MetricFlow)
 
-Marts support areas such as:
+Metrics are exposed via the **dbt Semantic Layer** to ensure "Single Source of Truth" definitions.
 
-- transaction reporting
-- disbursement operations
-- fincrime monitoring
-- exploratory onboarding and engagement analysis
+* **Ratio Handling:** Metrics like `false_positive_rate` are defined as ratios of measures. This ensures that when a user slices data by "Country" or "Rule Category," the Semantic Layer aggregates the numerators and denominators *before* dividing, preventing mathematical errors associated with pre-calculated percentages.
 
-This structure separates:
+## 8. Orchestration & CI/CD
 
-- source standardisation
-- reusable transformation logic
-- business-facing analytical models
-
-The separation improves maintainability and makes lineage easier to follow  
-from raw data to analytical outputs.
+* **Schedule:** Hourly runs for Staging/Intermediate; Daily morning refreshes for Marts/Semantic layers.
+* **Slim CI:** Implementation of state-based testing in GitHub Actions to ensure only modified models and their downstream impacts are tested during development.
 
 ---
 
-## 4. Snowflake Warehouse Provisioning
-
-The Snowflake environment is structured to support both ingestion and analytical workloads.
-
-Typical components include:
-
-- Raw data ingestion schemas
-- Analytics transformation schemas
-- Dedicated virtual warehouses for transformation workloads
-
-Example logical structure:
-
-Raw ingestion layer → staging → intermediate → marts → semantic layer.
-
----
-
-## 5. Materialization Strategy
-
-Different dbt models use different materializations depending on usage patterns:
-
-| Layer | Materialization |
-|-----|------|
-| Staging | Views |
-| Intermediate | Views |
-| Marts | Tables |
-| Semantic | Views |
-
-This approach balances **performance, cost efficiency, and maintainability**.
-
----
-
-## 6. CDC Handling for StreamServe Sources
-
-Some operational sources may use **change data capture (CDC)** patterns.
-
-The staging layer is responsible for:
-
-- Handling late arriving updates
-- Deduplicating records
-- Selecting the latest valid version of records
-
-This ensures downstream models operate on **clean, consistent datasets**.
-
----
-
-## 7. Cross-Source Enrichment Strategy
-
-Certain Fincrime records reference backend entities via identifiers embedded within context payloads.
-
-The transformation layer extracts these identifiers and performs joins with backend transaction data.
-
-This allows risk and operational workflows to be analysed alongside core payment activity.
-
----
-
-## 8. Mart Design for Business Requirements
-
-The marts layer is organised around the business domains specified in the assessment:
-
-### Finance Reporting
-Transaction-level reporting datasets.
-
-### Disbursement Operations
-Operational visibility into payout processes.
-
-### Fincrime Operations
-Monitoring of rule execution outcomes and review workflows.
-
-### Fincrime Task Pipeline
-Operational tracking of tasks generated by the risk platform.
-
-### Exploratory Product Analytics
-Exploratory models analysing onboarding funnels and product engagement.
-
----
-
-## 9. Semantic Layer Approach
-
-The semantic layer exposes **business-friendly metrics** built on top of mart models.
-
-Metrics are defined once and reused consistently across analytical tools.
-
-Examples include:
-
-- Transaction success rates
-- Disbursement performance
-- Fincrime rule outcomes
-- Onboarding funnel conversion
-
----
-
-## 10. Testing Strategy
-
-Data quality is enforced using dbt tests across the transformation layers.
-
-Typical tests include:
-
-- Primary key uniqueness
-- Not-null constraints
-- Accepted value checks
-- Referential integrity between models
-
-These tests ensure the reliability of analytics datasets.
-
----
-
-## 11. Orchestration and Deployment Workflow
-
-dbt models are executed as part of a scheduled transformation pipeline.
-
-Typical orchestration steps include:
-
-1. Ingest raw source data into Snowflake
-2. Execute dbt staging models
-3. Build intermediate transformations
-4. Materialise marts
-5. Update semantic layer metrics
-
----
-
-## 12. Key Assumptions and Trade-offs
-
-This design makes several assumptions due to the limited information available in the assessment brief.
-
-Examples include:
-
-- Source ingestion pipelines already exist
-- Operational systems provide stable primary keys
-- Event schemas are reasonably consistent
-
-These assumptions allow the architecture to focus on the transformation and modelling layers.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 9. Key Assumptions
+
+* **CDC Handling:** We assume upstream ingestion provides a `_streamserve_timestamp` or similar for deduplication.
+* **ID Stability:** We assume `user_id` and `transaction_id` are stable across systems.
+* **Timezones:** All timestamps are standardized to `UTC` in the staging layer.
