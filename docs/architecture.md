@@ -101,10 +101,9 @@ A key challenge is linking:
 
 ### Join Strategy
 
-- Prioritize **transaction-level matches**
-- Fallback to **user-level matches**
-- Join Strategy:** I prioritize **Transaction-level matches**
-- Fallback to **User-level matches** using `QUALIFY ROW_NUMBER()` to ensure the most granular correlation is preserved.
+- Prioritize `transaction-level matches` 
+- Fallback to `user-level matches`
+- Using `QUALIFY ROW_NUMBER()` to ensure the most granular correlation is preserved.
 
 ## 6. Testing & Quality Standards
 
