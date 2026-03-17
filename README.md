@@ -12,6 +12,26 @@ The goal of this submission is to design a scalable analytics architecture and d
 - Production-ready dbt project structure
 
 ---
+## 🗺️ Project Navigation
+
+To review the specific deliverables for the Senior Analytics Engineer assessment, please use the links below:
+
+### 📖 Documentation & Strategy
+* **[Architecture Decision Log](docs/architecture.md)**: Detailed reasoning for Snowflake provisioning, `delete+insert` incremental strategies, and the 3-day lookback logic.
+* **[AI Agent Handbook (AGENTS.md)](AGENTS.md)**: Operational instructions and standards for AI agents interacting with this repository.
+* **[AI Prompt Log (PROMPT_LOG.md)](prompt_log.md)**: A transparent record of AI collaboration used to develop this project (Deliverable 3).
+
+### 📊 Requirement Mapping (Models)
+| Business Requirement | Primary dbt Model |
+| :--- | :--- |
+| **1. Finance Performance** | `fct_daily_corridor_performance.sql` |
+| **2. Ops Performance** | `fct_daily_disbursement_provider_performance.sql` |
+| **3. Fincrime Ops** | `fct_daily_rule_performance.sql` |
+| **4. Fincrime Pipeline** | `int_fincrime__task_workflow_mapping.sql` |
+| **5. Growth POC** | `dim_users.sql` |
+
+### 🧠 Semantic Layer
+* **[Semantic Model Definitions](models/semantic/semantic_models.yml)**: MetricFlow definitions for Success Rates, False Positive Rates, and Activation Funnels.
 
 ## Assessment Instructions
 
