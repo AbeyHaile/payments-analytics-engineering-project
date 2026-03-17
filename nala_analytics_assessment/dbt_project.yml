@@ -5,8 +5,8 @@
 name: 'nala_analytics_assessment'
 version: '1.0.0'
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'nala_analytics_assessment'
+# Select the dbt profile used for the project.
+profile: "nala_analytics_assessment"
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -16,12 +16,11 @@ analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
 
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
-
+  - "logs"
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -31,6 +30,30 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   nala_analytics_assessment:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    # Config indicated by + and applies to all files under models/staging/
+    staging:
+      materialized: view
+      backend:
+        schema: backend
+      fincrime:
+        schema: fincrime
+      amplitude:
+        schema: amplitude
+    
+    # Intermediate Layer: Views or Ephemeral for internal logic
+    intermediate:
+      materialized: view
+      schema: intermediate
+
+    # Marts Layer: Performance layer using incremental strategy
+    mart:
+      materialized: incremental
+      incremental_strategy: delete+insert
+      
+      core:
+        schema: analytics_core
+      finance:
+        schema: analytics_finance
+      fincrime:
+        schema: analytics_fincrime
+      ops:git         schema: analytics_ops
