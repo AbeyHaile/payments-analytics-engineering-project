@@ -50,12 +50,28 @@ The project follows a modular, three-tier dbt structure:
 | **Intermediate** | `view` / `ephemeral` | Complex joins and cross-source entity resolution (e.g., Task-to-Workflow mapping). |
 | **Marts** | `incremental` | Aggregated, stakeholder-facing tables optimized for performance. |
 
+---
+
 ### 3.1 Incremental Strategy: `delete+insert`
 
-For all performance marts (Fincrime, Ops, and Finance), we utilize the **`delete+insert` strategy** with a **3-day lookback window**.
+All performance marts (Fincrime, Ops, Finance) use the **`delete+insert` strategy** with a **3-day lookback window**.
 
-* **Logic:** Fintech operations are often asynchronous. A transaction or task created on Day 1 may only reach a terminal state (Resolved/Failed) on Day 3.
-* **Implementation:** We use `get_max_of_table_column` to identify the high-water mark and subtract 3 days to re-process potentially updated records, ensuring 100% data accuracy without full table scans.
+#### Rationale
+
+Fintech workflows are asynchronous:
+- A transaction created on Day 1 may only complete on Day 2–3
+- Late-arriving updates must be captured reliably
+
+#### Implementation
+
+- Use a high-water mark (`max(metric_date)`)
+- Reprocess **last 3 days**
+- Ensures:
+  - No missed updates
+  - No full table scans
+  - Deterministic outputs
+
+---
 
 ## 4. Data Integrity & Surrogate Keys
 
