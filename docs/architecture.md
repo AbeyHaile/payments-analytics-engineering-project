@@ -122,17 +122,29 @@ Using `dbt_utils.expression_is_true`:
 * **Outcome Consistency:** Ensuring "False Positives" only occur when the system result was "FAIL".
 
 
-
 ## 7. Semantic Layer (MetricFlow)
 
-Metrics are exposed via the **dbt Semantic Layer** to ensure "Single Source of Truth" definitions.
+Metrics are exposed via the **dbt Semantic Layer** to ensure consistent definitions.
 
-* **Ratio Handling:** Metrics like `false_positive_rate` are defined as ratios of measures. This ensures that when a user slices data by "Country" or "Rule Category," the Semantic Layer aggregates the numerators and denominators *before* dividing, preventing mathematical errors associated with pre-calculated percentages.
+### Key Principle: Ratio Safety
+
+Metrics like: `false_positive_rate = false_positives / total_cases` 
+are defined as **ratios of measures**, not pre-calculated fields.
+
+### Why this matters
+
+When slicing by dimensions (e.g., country, rule):
+
+- Numerator and denominator are aggregated first
+- Division happens afterward
+
+This prevents incorrect aggregations.
+
+Metrics are exposed via the **dbt Semantic Layer** to ensure "Single Source of Truth" definitions.
 
 ## 8. Orchestration & CI/CD
 
 * **Schedule:** Hourly runs for Staging/Intermediate; Daily morning refreshes for Marts/Semantic layers.
-* **Slim CI:** Implementation of state-based testing in GitHub Actions to ensure only modified models and their downstream impacts are tested during development.
 
 ---
 
