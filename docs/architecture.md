@@ -155,9 +155,12 @@ Metrics are exposed via the **dbt Semantic Layer** to ensure "Single Source of T
 * **Timezones:** All timestamps are standardized to `UTC` in the staging layer.
 
 ### 10. Requirements Mapping
-Logic Location,Implementation Detail
-Req 1: Finance,fact_daily_transaction_corridor_performance,Filters for outbound disbursement types; converts to USD.
-Req 2: Ops,fact_daily_disbursement_provider_performance,"SLA time-banding (e.g., <1 min, 1-5 mins)."
-Req 3: Fincrime,fact_daily_rule_performance,Volume and False Positive Rates per rule/category.
-Req 4: Pipeline,fact_fincrime_task_pipeline,Correlates Source 1 (Tasks) with Source 2 (Workflows).
-Req 5: Growth,dim_users,POC Funnel: Signup -> First Transaction hours.
+## 13. Requirements Mapping
+
+| Requirement | dbt Model | Implementation Detail |
+| :--- | :--- | :--- |
+| **1. Finance Performance** | `fct_daily_corridor_performance` | Aggregates outbound disbursements by corridor; includes success/fail/error volumes. |
+| **2. Ops Performance** | `fct_daily_disbursement_provider_performance` | Tracks provider-specific health with SLA time-banding (e.g., `< 1 min`, `1-5 mins`). |
+| **3. Fincrime Ops** | `fct_daily_rule_performance` | Calculates False Positive Rates (FPR) and Volume per rule name and category. |
+| **4. Fincrime Pipeline** | `int_fincrime__task_workflow_mapping` | Primary "Heavy Lifting" model correlating Source 1 (Tasks) with Source 2 (Workflows). |
+| **5. Growth (Exploratory)** | `dim_users` | Tracks onboarding milestones and `signup_to_first_transaction_hours` for funnel analysis. |
