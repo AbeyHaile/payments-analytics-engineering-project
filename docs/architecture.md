@@ -1,7 +1,3 @@
-Here is the finalized, senior-level **Architecture Document** in Markdown format. This version is specifically tailored to the NALA assessment requirements, emphasizing the "why" behind your engineering choices.
-
----
-
 # Architecture Document: NALA Payments Analytics
 
 ## 1. Overview
