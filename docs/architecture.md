@@ -153,3 +153,11 @@ Metrics are exposed via the **dbt Semantic Layer** to ensure "Single Source of T
 * **CDC Handling:** We assume upstream ingestion provides a `_streamserve_timestamp` or similar for deduplication.
 * **ID Stability:** We assume `user_id` and `transaction_id` are stable across systems.
 * **Timezones:** All timestamps are standardized to `UTC` in the staging layer.
+
+### 10. Requirements Mapping
+Logic Location,Implementation Detail
+Req 1: Finance,fact_daily_transaction_corridor_performance,Filters for outbound disbursement types; converts to USD.
+Req 2: Ops,fact_daily_disbursement_provider_performance,"SLA time-banding (e.g., <1 min, 1-5 mins)."
+Req 3: Fincrime,fact_daily_rule_performance,Volume and False Positive Rates per rule/category.
+Req 4: Pipeline,fact_fincrime_task_pipeline,Correlates Source 1 (Tasks) with Source 2 (Workflows).
+Req 5: Growth,dim_users,POC Funnel: Signup -> First Transaction hours.
