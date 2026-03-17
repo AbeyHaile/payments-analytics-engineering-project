@@ -1,0 +1,146 @@
+version: 2
+
+models:
+  - name: fact_daily_disbursement_provider_performance
+    description: >
+      Final mart for disbursement provider performance analysis.
+      Provides a daily view of payout attempt outcomes and processing speed by provider,
+      enabling monitoring of success rates, failure rates, and operational latency.
+
+      **Grain:**
+      1 row per (metric_date, disbursement_provider)
+
+      **Business Requirements Met:**
+      - Daily Provider Volume: Count of disbursement attempts per provider per day
+      - Success Monitoring: Count and rate of completed attempts
+      - Failure Monitoring: Count of failed attempts
+      - Speed Monitoring: Average time to complete and average time to fail
+      - Time Band Analysis: Distribution of attempts across processing time bands
+
+      **Assumptions:**
+      - Each row in the base model represents one disbursement attempt
+      - `disbursement_attempt_state = 'COMPLETED'` indicates a successful payout attempt
+      - `disbursement_attempt_state = 'FAILED'` indicates an unsuccessful payout attempt
+      - `minutes_to_complete` is populated only for completed attempts
+      - `minutes_to_fail` is populated only for failed attempts
+      - Processing time bands are mutually exclusive and collectively represent attempt latency buckets
+
+    columns:
+      - name: kpi_report_pk
+        description: "Primary key. Hash of (metric_date, disbursement_provider)."
+        data_tests:
+          - unique
+          - not_null
+      - name: metric_date
+        description: Date on which the disbursement attempt was recorded.
+        data_tests:
+          - not_null
+      - name: disbursement_provider
+        description: Name of the disbursement provider handling the payout attempt.
+      - name: total_attempts
+        description: Total number of disbursement attempts for the provider on the day.
+        data_tests:
+          - not_null
+      - name: total_successes
+        description: Number of disbursement attempts that completed successfully.
+      - name: total_failures
+        description: Number of disbursement attempts that failed.
+      - name: disbursement_provider_success_rate_pct
+        description: Percentage of total attempts that completed successfully.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+      - name: avg_minutes_to_complete
+        description: Average number of minutes taken for successful disbursement attempts to complete.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 43200
+      - name: avg_minutes_to_fail
+        description: Average number of minutes taken for failed disbursement attempts to reach failure.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 43200
+      - name: attempts_under_1_minute
+        description: Count of attempts completed or failed in under 1 minute.
+      - name: attempts_1_to_5_minutes
+        description: Count of attempts completed or failed in 1 to 5 minutes.
+      - name: attempts_5_to_30_minutes
+        description: Count of attempts completed or failed in 5 to 30 minutes.
+      - name: attempts_30_to_60_minutes
+        description: Count of attempts completed or failed in 30 to 60 minutes.
+      - name: attempts_1_to_24_hours
+        description: Count of attempts completed or failed in 1 to 24 hours.
+      - name: attempts_over_24_hours
+        description: Count of attempts completed or failed in over 24 hours.
+
+
+  - name: fact_daily_corridor_success_rate
+    description: >
+      Final mart for Fincrime workflow outcome analysis by transaction corridor.
+      Provides a daily view of workflow execution outcomes across source and destination
+      corridors, enabling monitoring of pass rates, hard rejections, and technical errors.
+
+      **Grain:**
+      1 row per (metric_date, source_country, destination_country, corridor)
+
+      **Business Requirements Met:**
+      - Daily Corridor Volume: Count of distinct transactions evaluated per day and corridor
+      - Outcome Monitoring: Breakdown of PASS / FAIL / ERROR workflow results
+      - Success Rate: Percentage of transactions passing workflow checks
+      - Failure Rate: Percentage of transactions hard rejected by workflow checks
+      - Technical Monitoring: Percentage of transactions ending in technical error states
+
+      **Assumptions:**
+      - Each distinct transaction_id represents one workflow-evaluated transaction attempt
+      - `workflow_execution_result = 'PASS'` indicates a successful automated clearance
+      - `workflow_execution_result = 'FAIL'` indicates a hard rejection by the workflow
+      - `workflow_execution_result = 'ERROR'` indicates a technical failure rather than a business rejection
+      - Rates are calculated as percentages of total distinct attempted transactions
+
+    columns:
+      - name: kpi_report_pk
+        description: "Primary key. Hash of (metric_date, source_country, destination_country, corridor)."
+        data_tests:
+          - unique
+          - not_null
+      - name: metric_date
+        description: Date on which the workflow outcome was recorded.
+        data_tests:
+          - not_null
+      - name: source_country
+        description: Source country of the transaction.
+      - name: destination_country
+        description: Destination country of the transaction.
+      - name: corridor
+        description: Transaction corridor in source-destination format.
+      - name: total_attempt_transactions
+        description: Total number of distinct transactions evaluated for the corridor on the day.
+        data_tests:
+          - not_null
+      - name: successful_passes
+        description: Number of distinct transactions with workflow_execution_result = 'PASS'.
+      - name: hard_rejections
+        description: Number of distinct transactions with workflow_execution_result = 'FAIL'.
+      - name: technical_errors
+        description: Number of distinct transactions with workflow_execution_result = 'ERROR'.
+      - name: success_rate_pct
+        description: Percentage of attempted transactions that passed workflow checks.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+      - name: failure_rate_pct
+        description: Percentage of attempted transactions that were hard rejected.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+      - name: technical_error_rate_pct
+        description: Percentage of attempted transactions that resulted in workflow technical errors.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100

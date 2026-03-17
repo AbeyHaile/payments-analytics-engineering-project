@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: fact_daily_transaction_corridor_performance
+    description: >
+      Final mart for transaction corridor performance analysis.
+      Provides a daily view of qualifying outbound transaction attempts and completed transaction
+      success rates by source and destination corridor, enabling monitoring of corridor-level
+      payment performance.
+
+      **Grain:**
+      1 row per (metric_date, source_country, destination_country, corridor)
+
+      **Business Requirements Met:**
+      - Daily Corridor Volume: Count of qualifying outbound transaction attempts per day and corridor
+      - Completion Monitoring: Count of completed qualifying transactions
+      - Success Rate: Percentage of qualifying attempts that completed successfully
+      - Corridor Analysis: Comparison of transaction performance across source and destination corridors
+
+      **Assumptions:**
+      - Only the following transaction types qualify as real outbound money movement:
+        - DISBURSEMENT
+        - CONVERSION_DISBURSEMENT
+        - COLLECTION_CONVERSION_DISBURSEMENT
+      - `transaction_state = 'COMPLETED'` indicates a successful completed outbound transaction
+      - `corridor` is a business-facing dimension representing the source-destination payment path
+      - Success rate is calculated as completed qualifying transactions divided by qualifying transaction attempts
+      - If included, `completed_transaction_volume` represents the sum of sent amounts for completed qualifying transactions
+
+    columns:
+      - name: kpi_report_pk
+        description: "Primary key. Hash of (metric_date, source_country, destination_country, corridor)."
+        data_tests:
+          - unique
+          - not_null
+      - name: metric_date
+        description: Date on which the transaction activity was recorded.
+        data_tests:
+          - not_null
+      - name: source_country
+        description: Source country of the outbound transaction.
+      - name: destination_country
+        description: Destination country of the outbound transaction.
+      - name: corridor
+        description: Transaction corridor in source-destination format.
+      - name: qualifying_transaction_attempts
+        description: Total number of qualifying outbound transaction attempts for the corridor on the day.
+        data_tests:
+          - not_null
+      - name: completed_qualifying_transactions
+        description: Number of qualifying outbound transactions that completed successfully.
+      - name: transaction_success_rate_pct
+        description: Percentage of qualifying outbound transaction attempts that completed successfully.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+      - name: completed_transaction_volume
+        description: Sum of sent amounts for completed qualifying outbound transactions.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0

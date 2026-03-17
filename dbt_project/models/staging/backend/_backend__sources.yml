@@ -1,0 +1,636 @@
+version: 2
+
+models:
+
+  - name: stg_backend__collection_payment_attempts
+    description: >
+      Standardised payment attempt records from the backend application source.
+      This staging model preserves a 1:1 relationship with the upstream table
+      and provides a clean schema for downstream transformations.
+    columns:
+      - name: collection_id
+        description: Unique identifier for the payment collection attempt (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: collection_id
+        description: Identifier of the parent collection this payment attempt belongs to.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__transactions_collection')
+              field: collection_id
+      - name: created_at
+        description: Timestamp when the payment attempt was initiated.
+        data_tests:
+          - not_null
+      - name: currency
+        description: ISO currency code of the payment attempt amount.
+        data_tests:
+          - not_null
+      - name: error
+        description: Error message recorded when the payment attempt failed. Null on success.
+      - name: payment_attempt_amount
+        description: Amount of this payment attempt.
+        data_tests:
+          - not_null
+      - name: payment_attempt_state
+        description: Current state of the payment attempt.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - CREATED
+                - STARTED
+                - WAITING_ON_PROVIDER
+                - COMPLETED
+                - FAILED
+                - CANCELLED
+                - REFUNDED
+                - PENDING_CAPTURE
+                - CAPTURE_FAILED
+                - VOIDED
+      - name: payment_method_type
+        description: Type of payment method used for the attempt.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - CARD
+                - BANK_ACCOUNT
+                - APPLE_PAY
+                - GOOGLE_PAY
+                - IDEAL
+                - SOFORT
+                - WALLET
+      - name: provider_name
+        description: Name of the payment provider processing this attempt.
+      - name: updated_at
+        description: Timestamp of the most recent state change.
+
+
+  - name: stg_backend__disbursement
+    description: >
+      Standardised disbursement records from the backend application source.
+      This staging model preserves a 1:1 relationship with the upstream table
+      and provides a clean schema for downstream transformations.
+    columns:
+      - name: disbursement_id
+        description: Unique identifier for the disbursement (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: disbursement_amount
+        description: Amount being disbursed in the destination currency.
+        data_tests:
+          - not_null
+      - name: disbursement_created_at
+        description: Timestamp when the disbursement was created.
+        data_tests:
+          - not_null
+      - name: disbursement_currency
+        description: ISO currency code of the disbursement amount.
+        data_tests:
+          - not_null
+      - name: disbursement_provider
+        description: Name of the payout provider handling the disbursement.
+      - name: disbursement_state
+        description: Current state of the disbursement.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - CREATED
+                - READY
+                - PREPARED
+                - WAITING_ON_PROVIDER
+                - COMPLETED
+                - FAILED
+                - REVERSED
+                - AMBIGUOUS
+      - name: disbursement_updated_at
+        description: Timestamp of the most recent state change.
+      - name: recipient_account_id
+        description: Identifier of the recipient account receiving the disbursement.
+      - name: recipient_id
+        description: Identifier of the recipient associated with the disbursement.
+      - name: transaction_id
+        description: Identifier of the parent transaction.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__transactions')
+              field: transaction_id
+
+
+  - name: stg_backend__disbursement_attempts
+    description: >
+      Standardised disbursement attempt records from the backend application source.
+      Each record represents an attempt by a provider to execute a payout.
+    columns:
+      - name: disbursement_attempt_id
+        description: Unique identifier for the disbursement attempt (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: created_at
+        description: Timestamp when the disbursement attempt was initiated.
+        data_tests:
+          - not_null
+      - name: disbursement_id
+        description: Identifier of the parent disbursement associated with this attempt.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__transactions_disbursement')
+              field: disbursement_id
+      - name: error
+        description: Error message returned by the provider when the attempt fails.
+      - name: disbursement_provider
+        description: Name of the payout provider processing the disbursement attempt.
+      - name: disbursement_attempt_state 
+        description: Current state of the disbursement attempt.
+      - name: updated_at
+        description: Timestamp of the most recent state update.
+
+
+  - name: stg_backend__fx_rates
+    description: >
+      Standardised historical FX rate observations from the backend application source.
+      Each row represents a single exchange rate snapshot captured from a provider at a point in time.
+    columns:
+      - name: fx_rate_id
+        description: Unique identifier for the FX rate observation.
+        data_tests:
+          - not_null
+          - unique
+      - name: amount
+        description: Notional amount the FX rate was quoted for.
+        data_tests:
+          - not_null
+      - name: created_at
+        description: Timestamp when the FX rate was captured.
+        data_tests:
+          - not_null
+      - name: destination_currency
+        description: ISO currency code of the destination or buying currency.
+        data_tests:
+          - not_null
+      - name: provider_name
+        description: Name of the FX provider that supplied the rate.
+        data_tests:
+          - not_null
+      - name: rate
+        description: Exchange rate where 1 unit of source_currency equals rate units of destination_currency.
+        data_tests:
+          - not_null
+      - name: source_currency
+        description: ISO currency code of the source or selling currency.
+        data_tests:
+          - not_null
+
+
+  - name: stg_backend__tasks_task
+    description: >
+      Staging model for backend task records. Deduplicated using CDC metadata and enriched
+      with extracted fields from semi-structured columns. Provides task-level data with
+      primary entity and related user identifiers for downstream joins.
+    columns:
+      - name: task_id
+        description: Unique identifier of the task.
+        data_type: string
+        data_tests:
+          - not_null
+          - unique
+      - name: service
+        description: Service responsible for the task.
+      - name: task_type
+        description: Type/category of the task (e.g. transaction review, disbursement check).
+      - name: task_state
+        description: Current state of the task.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - OPEN
+                - IN_PROGRESS
+                - RESOLVED
+                - CANCELLED
+      - name: priority
+        description: Priority level assigned to the task.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - LOW
+                - MEDIUM
+                - HIGH 
+                - CRITICAL
+      - name: staff_id
+        description: Identifier of the staff member associated with the task.
+      - name: assignee_id
+        description: Identifier of the user assigned to handle the task.
+      - name: created_at
+        description: Timestamp when the task was created.
+        data_type: timestamp
+        data_tests:
+          - not_null
+      - name: last_updated_at
+        description: Timestamp when the task was last updated.
+      - name: resolution
+        description: Resolution outcome of the task, if completed.
+        data_tests:
+          - accepted_values:
+              values:
+                - APPROVED
+                - REJECTED
+                - ESCALATED 
+      - name: primary_entity_id
+        description: >
+          Primary entity associated with the task, extracted from associated_ids[0].
+          Typically represents a transaction_id or user_id depending on task type.
+      - name: related_user_id
+        description: >
+          Secondary user identifier extracted from associated_ids[2], typically representing
+          the user linked to a transaction task.
+      - name: disbursement_id
+        description: Disbursement identifier extracted from task content JSON.
+      - name: account_id
+        description: Account identifier extracted from task content JSON.
+      - name: provider_name
+        description: Provider name extracted from task content JSON.
+
+
+  - name: stg_backend__transactions
+    description: >
+      Standardised transaction records from the backend.
+      Materialized incrementally with a merge strategy.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: transaction_id
+        data_type: string
+        description: Unique identifier of the transaction.
+        data_tests:
+          - not_null
+          - unique
+      - name: user_id
+        data_type: string
+        description: Identifier of the user initiating the transaction.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__users')
+              field: user_id
+      - name: sent_amount
+        data_type: numeric
+        description: Amount sent in source currency.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+      - name: source_amount
+        data_type: numeric
+        description: original value initiated.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+      - name: received_amount
+        data_type: numeric
+        description:  Amount received in the destination currency.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+      - name: created_at
+        data_type: timestamp
+        description: Timestamp when the transaction was created.
+        data_tests:
+          - not_null
+      - name: account_id
+        data_type: string
+        description: Identifier of the account associated with the transaction.
+      - name: exchange_rate
+        data_type: numeric
+        description: FX rate applied to the transaction.
+      - name: from_wallet_id
+        data_type: string
+        description: Identifier of the source wallet.
+      - name: recipient_account_id
+        data_type: string
+        description: Identifier of the recipient account.
+      - name: recipient_id
+        data_type: string
+        description: Identifier of the transaction recipient.
+      - name: received_currency
+        data_type: string
+        description: Currency code of the received amount.
+      - name: sent_currency
+        data_type: string
+        description: Currency code of the sent amount.
+      - name: to_wallet_id
+        data_type: string
+        description: Identifier of the destination wallet.
+      - name: expires_at
+        data_type: timestamp
+        description: Timestamp when the transaction expires if not completed.
+      - name: transaction_fee_kind
+        data_type: string
+        description: Classification of the fee applied.
+      - name: transaction_fee_label
+        data_type: string
+        description: Label describing the fee applied.
+      - name: transaction_memo
+        data_type: string
+        description: Optional memo provided by the sender.
+      - name: transaction_metadata
+        data_type: variant
+        description: Additional metadata provided by upstream systems.
+      - name: transaction_purpose
+        data_type: string
+        description: Declared purpose of the transfer.
+      - name: transaction_state
+        data_type: string
+        description: Current lifecycle state of the transaction.
+      - name: transaction_summary
+        data_type: variant
+        description: Structured summary describing the transaction.
+      - name: transaction_type
+        data_type: string
+        description: Type of transaction.
+      - name: updated_at
+        data_type: timestamp
+        description: Timestamp used to identify the latest known version of the transaction and support incremental processing.
+      - name: workflow_id
+        data_type: string
+        description: Identifier linking the transaction to an associated workflow.
+
+
+  - name: stg_backend__transactions_collection
+    description: >
+      Standardised collection records from the backend application source.
+      This staging model preserves a 1:1 relationship with the upstream table
+      and provides a clean schema for downstream transformations.
+    columns:
+      - name: collection_id
+        description: Unique identifier for the collection (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: Identifier of the account the collection is created for.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__users_account')
+              field: account_id
+      - name: collection_amount
+        description: Amount being collected.
+        data_tests:
+          - not_null
+      - name: collection_created_at
+        description: Timestamp when the collection was created.
+        data_tests:
+          - not_null
+      - name: collection_currency
+        description: ISO currency code of the collection amount.
+        data_tests:
+          - not_null
+      - name: collection_state
+        description: Current state of the collection.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - CREATED
+                - STARTED
+                - WAITING_ON_CUSTOMER
+                - WAITING_ON_PROVIDER
+                - COMPLETED
+                - FAILED
+                - CANCELLED
+                - REFUNDED
+                - PENDING_CAPTURE
+                - CAPTURE_FAILED
+                - VOIDED
+      - name: collection_updated_at
+        description: Timestamp of the most recent state change.
+      - name: to_wallet_id
+        description: Identifier of the wallet the collected funds are credited to.
+        data_tests:
+          - relationships:
+              to: ref('stg_backend__wallets')
+              field: wallet_id
+      - name: transaction_id
+        description: Identifier of the parent transaction.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__transactions')
+              field: transaction_id
+
+
+  - name: stg_backend__transactions_recipient
+    description: >
+      Standardised recipient records from the backend application source.
+      Recipients represent payout destinations associated with transactions.
+    columns:
+      - name: recipient_id
+        description: Unique identifier for the recipient (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: Identifier of the account that owns the recipient.
+        data_tests:
+          - relationships:
+              to: ref('stg_backend__users_account')
+              field: account_id
+      - name: created_at
+        description: Timestamp when the recipient record was created.
+      - name: provider_name
+        description: Name of the payout provider associated with the recipient.
+      - name: recipient_name
+        description: Display name assigned to the recipient.
+      - name: recipient_type
+        description: Type of recipient destination.
+        data_tests:
+          - accepted_values:
+              values:
+                - INDIVIDUAL
+                - BUSINESS
+      - name: updated_at
+        description: Timestamp of the most recent update to the recipient record.
+
+
+  - name: stg_backend__transactions_recipient_account
+    description: >
+      Standardised recipient account records from the backend application source.
+      Each record represents a payment destination for a recipient.
+    columns:
+      - name: recipient_account_id
+        description: Unique identifier for the recipient account (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: account_number
+        description: Bank account number or destination identifier. Null for non-bank destination types.
+      - name: bank_code
+        description: Bank identifier code. Null for non-bank destination types.
+      - name: bank_name
+        description: Name of the bank. Null for non-bank destination types.
+      - name: country
+        description: ISO country code of the recipient account destination country.
+      - name: created_at
+        description: Timestamp when the recipient account was created.
+        data_tests:
+          - not_null
+      - name: currency
+        description: ISO currency code of the destination currency.
+      - name: operator
+        description: Mobile money operator name. Null for non-mobile-money destination types.
+      - name: phone_number
+        description: Recipient phone number for mobile money destinations. Null for non-mobile-money destination types.
+      - name: recipient_id
+        description: Identifier of the parent recipient.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__transactions_recipient')
+              field: recipient_id
+      - name: recipient_account_type
+        description: Payment destination type.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values:
+                - MOBILE_MONEY
+                - BANK_ACCOUNT
+                - UPI
+                - BUY_GOODS
+                - PAY_BILL
+                - PEER_TO_PEER
+      - name: updated_at
+        description: Timestamp of the most recent update to the recipient account record.
+
+
+  - name: stg_backend__users
+    description: >
+      Standardised user records from the backend. This model maintains a 1:1 relationship 
+      with the source and serves as the entry point for user-related transformations.
+    columns:
+      - name: user_id
+        description: Primary key for the user (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: user_allowed_at
+        description: Timestamp when the user passed KYC and was approved for transactions.
+      - name: user_client_properties
+        description: Raw JSON containing device metadata (OS, App Version, Device Type).
+      - name: created_at
+        description: Timestamp when the user profile was first created.
+        data_tests:
+          - not_null
+      - name: profile_picture
+        description: URL or reference to the user's profile image.
+      - name: sender_country
+        description: ISO 3166-1 alpha-2 country code of the user.
+        data_tests:
+          - not_null
+      - name: user_source
+        description: Raw JSON containing marketing attribution (UTM parameters, referral info).
+      - name: user_status
+        description: Current lifecycle status of the user account.
+        data_tests:
+          - accepted_values:
+              values: ['ACTIVE', 'PENDING', 'SUSPENDED', 'INACTIVE']
+      - name: used_invitation_code_id
+        description: Identifier for the referral/invitation code used during signup.
+      - name: user_usage
+        description: Raw JSON containing user preferences and intended platform usage.
+
+
+models:
+  - name: stg_backend__users_account
+    description: >
+      Standardised account records from the backend application source.
+      This staging model preserves a 1:1 relationship with the upstream table
+      and provides a clean schema for downstream transformations.
+    columns:
+      - name: account_id
+        description: Unique identifier for the account (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: account_client_properties
+        description: Raw JSON object containing client-side metadata captured for the account.
+      - name: account_created_at
+        description: Timestamp when the account was created.
+        data_tests:
+          - not_null
+      - name: account_deleted_at
+        description: Timestamp when the account was soft-deleted. Null if the account is active.
+      - name: account_features
+        description: Raw JSON object containing feature flags and capabilities enabled for the account.
+      - name: account_last_updated_at
+        description: Timestamp of the most recent update to the account record.
+      - name: account_limit_level
+        description: Transaction limit tier assigned to the account.
+      - name: account_name
+        description: Display name of the account.
+      - name: account_status
+        description: Current status of the account.
+        data_tests:
+          - accepted_values:
+              values: ['ACTIVE', 'INACTIVE', 'SUSPENDED']
+      - name: account_type
+        description: Type of account.
+        data_tests:
+          - accepted_values:
+              values: ['PERSONAL', 'BUSINESS']
+      - name: profile_id
+        description: Identifier of the account profile configuration.
+      - name: user_id
+        description: Identifier of the user who owns the account.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__users')
+              field: user_id
+
+
+  - name: stg_backend__wallets
+    description: >
+      Standardised wallet records from the backend application source.
+      This staging model preserves a 1:1 relationship with the upstream table
+      and provides a clean schema for downstream transformations.
+    columns:
+      - name: wallet_id
+        description: Unique identifier for the wallet (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: Identifier of the account that owns the wallet.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_backend__users_account')
+              field: account_id
+      - name: created_at
+        description: Timestamp when the wallet was created.
+        data_tests:
+          - not_null
+      - name: currency_code
+        description: ISO 4217 currency code associated with the wallet.
+      - name: is_enabled
+        description: Indicates whether the wallet is currently active.
+      - name: provider_name
+        description: Name of the provider managing the wallet.
+      - name: updated_at
+        description: Timestamp of the most recent update to the wallet record.
+      - name: wallet_type
+        description: Type of wallet.
+        data_tests:
+          - accepted_values:
+              values: ['CASH', 'CREDIT']

@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_amplitude__events
+    description: >
+      Standardised Amplitude product analytics events loaded into Snowflake via
+      Fivetran. Each row represents a single mobile app event captured across
+      the user lifecycle, including anonymous activity, onboarding, KYC, and
+      transaction-related interactions.
+    columns:
+      - name: event_id
+        description: Unique identifier for the Amplitude event.
+        data_tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: Identifier of the NALA user associated with the event. Null for anonymous events before login or signup.
+      - name: device_id
+        description: Unique device identifier associated with the event.
+        data_tests:
+          - not_null
+      - name: event_type
+        description: Name of the event captured in Amplitude.
+        data_tests:
+          - not_null
+      - name: event_time
+        description: Timestamp when the event occurred on the client device.
+        data_tests:
+          - not_null
+      - name: event_properties
+        description: Raw JSON object containing event-level properties captured by Amplitude.
+      - name: user_properties
+        description: Raw JSON object containing user attributes at the time of the event.
+      - name: platform
+        description: Client platform that generated the event.
+      - name: os_name
+        description: Operating system name of the client device.
+      - name: country
+        description: ISO country code derived from the user's IP address.
+      - name: city
+        description: City derived from IP geolocation.
+      - name: app_version
+        description: Version of the NALA app that generated the event.
+      - name: session_id
+        description: Session identifier grouping events within a single app session.
+      - name: server_upload_time
+        description: Timestamp when Amplitude servers received the event.
+        data_tests:
+          - not_null

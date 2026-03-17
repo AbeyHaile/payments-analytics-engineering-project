@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: dim_users
+    description: >
+      Dimension table for user onboarding and activation analysis.
+      Provides one row per user with key onboarding milestones, activation status,
+      and time-to-activation attributes for downstream reporting and segmentation.
+
+      **Grain:**
+      1 row per user_id
+
+      **Business Requirements Met:**
+      - User Onboarding Tracking: Captures signup and activation milestones
+      - Activation Monitoring: Identifies whether a user has activated
+      - Journey Analysis: Measures time from signup to first transaction
+      - Segmentation: Supports grouping users by activation status and signup country
+
+      **Assumptions:**
+      - `user_id` is the stable unique identifier for a user
+      - `activation_at` represents the timestamp of the user's first successful activation event
+      - `is_activated = 1` indicates the user has completed activation
+      - `signup_to_first_transaction_hours` is populated only for activated users
+      - `activation_status` is a derived descriptive attribute for reporting convenience
+
+    columns:
+      - name: user_id
+        description: Unique identifier for the user.
+        data_tests:
+          - unique
+          - not_null
+      - name: sender_country
+        description: Country associated with the user at signup.
+      - name: signup_at
+        description: Timestamp when the user signed up.
+        data_tests:
+          - not_null
+      - name: signup_date
+        description: Date when the user signed up.
+        data_tests:
+          - not_null
+      - name: activation_at
+        description: Timestamp when the user first activated.
+      - name: activation_date
+        description: Date when the user first activated.
+      - name: is_activated
+        description: Flag indicating whether the user has activated.
+        data_tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: activation_status
+        description: Derived user-friendly activation label (Activated or Pending).
+        data_tests:
+          - accepted_values:
+              values: ['Activated', 'Pending']
+      - name: signup_to_first_transaction_hours
+        description: Number of hours between signup and first transaction.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+    data_tests:
+      - dbt_utils.expression_is_true:
+          expression: "CASE WHEN is_activated = 1 THEN activation_at IS NOT NULL ELSE TRUE END"
+      - dbt_utils.expression_is_true:
+          expression: "CASE WHEN is_activated = 1 THEN signup_to_first_transaction_hours >= 0 ELSE TRUE END"
+      - dbt_utils.expression_is_true:
+          name: activation_after_signup
+          expression: "activation_at >= signup_at"

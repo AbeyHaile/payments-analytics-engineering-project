@@ -1,0 +1,172 @@
+version: 2
+
+models:
+  - name: int_fincrime__task_workflow_mapping
+    description: >
+      Intermediate model bridging Fincrime Workflow Executions (Source 1) and Backend Tasks (Source 2).
+      **Core Logic:**
+      - **Incremental Strategy:** Uses a 3-day lookback on `task_updated_at` to capture status changes (e.g., OPEN to RESOLVED).
+      - **Entity Resolution:** Decodes the polymorphic `primary_entity_id` by matching it against explicit IDs in the workflow context.
+      - **Deduplication:** Uses `QUALIFY` to prioritize Transaction-level matches over User-level matches and selects the closest time proximity.
+    columns:
+      - name: task_id
+        description: "Primary key. Unique identifier for the backend task."
+        data_data_tests:
+          - unique
+          - not_null
+      - name: task_created_date
+        description: "Partition/Cluster key. The date the task was initialized."
+        data_data_tests:
+          - not_null
+      - name: primary_entity_type
+        description: >
+          Resolved type of the ID found in Index 0 of the associated_ids array.
+          Values: 'TRANSACTION', 'USER', or 'UNKNOWN'.
+        data_data_tests:
+          - accepted_values:
+              values: ['TRANSACTION', 'USER', 'UNKNOWN']
+      - name: workflow_execution_id
+        description: "The ID of the automated Fincrime workflow that triggered this manual task."
+      - name: workflow_execution_result
+        description: "The system's automated decision (e.g., FAIL, PASS) prior to manual review."
+        data_data_tests:
+          - accepted_values:
+              values: ['PASS', 'FAIL', 'PENDING']
+      - name: task_state
+        description: "Current status of the human review process."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CANCELLED']
+      - name: resolution
+        description: "The final outcome determined by the human reviewer."
+        data_tests:
+          - accepted_values:
+              values: ['APPROVED', 'REJECTED', 'ESCALATED']
+      - name: minutes_to_resolution
+        description: >
+          The duration between task creation and the last update. 
+          Represents the 'speed to action' for the Fincrime ops team.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 43200 # 30 days in minutes as a sanity check
+      - name: task_updated_at
+        description: "Timestamp of the last record change. Used for the incremental High Water Mark."
+        data_tests:
+          - not_null
+
+
+  - name: int_fincrime__current_rules
+    description: >
+      Reference table containing the latest active version of each financial
+      crime detection rule. This model deduplicates rule versions and keeps
+      the most recent definition for each rule_name.
+    columns:
+      - name: rule_id
+        description: Unique identifier of the rule version retained in the model.
+        data_tests:
+          - not_null
+          - unique
+      - name: rule_name
+        description: Machine-readable name of the rule.
+      - name: rule_title
+        description: Human-readable title describing the rule.
+      - name: rule_category
+        description: Detection category associated with the rule.
+      - name: rule_type
+        description: Type of rule logic implemented.
+      - name: rule_version
+        description: Version number of the rule definition retained.
+      - name: rule_created_at
+        description: Timestamp when this rule version was created.
+
+
+  - name: int_fincrime__rule_executions_enriched
+    description: >
+      Enriched rule execution dataset at rule_execution_id grain.
+      Combines rule execution outcomes with rule metadata and the latest
+      human review decision to support fraud monitoring metrics such as
+      rule trigger volumes, false positive rates, and review turnaround time.
+    columns:
+      - name: rule_execution_id
+        description: Unique identifier for the rule execution event.
+        data_tests:
+          - not_null
+          - unique
+      - name: rule_id
+        description: Identifier of the rule that was executed.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__rules')
+              field: rule_id
+      - name: workflow_execution_id
+        description: Identifier of the workflow execution that triggered this rule.
+      - name: rule_name
+        description: Machine-readable name of the executed rule.
+      - name: rule_category
+        description: Detection category used for aggregation of fraud metrics.
+      - name: metric_date
+        description: Date derived from the rule execution timestamp used for reporting.
+      - name: rule_execution_result
+        description: Automated outcome of the rule evaluation.
+      - name: rule_review_status
+        description: Status of the manual review process for the rule execution.
+      - name: human_review_result
+        description: Outcome assigned by a human reviewer when applicable.
+      - name: execution_status_category
+        description: >
+          Mapped status combining the engine result and the human review 
+          (e.g., CONFIRMED_FRAUD, FALSE_POSITIVE).
+        data_tests:
+          - accepted_values:
+              values: [
+                'PASSED_AUTOMATICALLY', 'FAILED_NOT_REVIEWED', 'RULE_ERROR', 
+                'PENDING_REVIEW', 'CONFIRMED_FRAUD', 'FALSE_POSITIVE', 
+                'REVIEW_INCONCLUSIVE', 'REVIEW_RESULT_MISSING', 'UNEXPECTED_STATE'
+              ]
+      - name: rule_execution_created_at
+        description: Timestamp when the rule evaluation started.
+      - name: human_reviewed_at
+        description: Timestamp when the human review decision was recorded.
+      - name: minutes_to_review
+        description: >
+          Time difference in minutes between rule execution and the human
+          review decision. Used for monitoring fraud operations SLA.
+
+
+  - name: int_fincrime__workflow_executions_transactions
+    description: >
+      Workflow execution dataset enriched with transaction context.
+      This model connects fraud detection workflow outcomes with the
+      underlying transaction attributes to support corridor-level fraud
+      success rate analysis and transaction state monitoring.
+    columns:
+      - name: workflow_execution_id
+        description: Unique identifier of the workflow execution.
+        data_tests:
+          - not_null
+          - unique
+      - name: workflow_id
+        description: Identifier of the workflow definition executed.
+      - name: user_id
+        description: Identifier of the user associated with the workflow execution.
+      - name: transaction_id
+        description: Identifier of the transaction evaluated by the workflow.
+      - name: workflow_execution_result
+        description: Final outcome of the workflow execution.
+      - name: source_country
+        description: Country where the transaction originated.
+      - name: destination_country
+        description: Country where the funds were sent.
+      - name: corridor
+        description: >
+          Derived payment corridor combining source and destination
+          country (e.g. UK-KENYA).
+      - name: transaction_state
+        description: Current lifecycle state of the associated transaction.
+      - name: metric_date
+        description: Date derived from workflow execution timestamp for reporting.
+      - name: workflow_updated_at
+        description: Timestamp representing the latest known update to the workflow execution.

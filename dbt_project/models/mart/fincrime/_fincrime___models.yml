@@ -1,0 +1,148 @@
+version: 2
+
+models:
+  - name: fact_daily_rule_performance
+    description: >
+      Final mart for Fincrime rule performance analysis.
+      Provides a daily view of rule execution outcomes, human review results,
+      and rule quality metrics, enabling monitoring of rule effectiveness,
+      operational review volume, and false positive behaviour.
+
+      **Grain:**
+      1 row per (metric_date, rule_id)
+
+      **Business Requirements Met:**
+      - Daily Rule Volume: Count of rule executions per day
+      - Outcome Monitoring: Breakdown of PASS / FAIL / ERROR execution results
+      - Review Coverage: Count of executions reviewed by humans
+      - Rule Quality: Identification of false positives, true positives, and inconclusive reviews
+      - Efficiency: Average time from rule execution to human review outcome
+
+      **Assumptions:**
+      - `rule_id` is the stable identifier for a rule; `rule_name` and `rule_category` are descriptive attributes
+      - `human_review_result = 'FALSE_POSITIVE'` indicates the rule flagged a case that was later cleared by review
+      - `human_review_result = 'TRUE_POSITIVE'` indicates the rule correctly flagged a risky case
+      - `false_positive_rate_pct` is calculated as false positives divided by reviewed executions
+      - `minutes_to_review` is populated only where a human review outcome exists
+
+    columns:
+      - name: kpi_report_pk
+        description: "Primary key. Hash of (metric_date, rule_id, rule_name, rule_category)."
+        data_tests:
+          - unique
+          - not_null
+      - name: metric_date
+        description: Date on which the rule execution was recorded.
+        data_tests:
+          - not_null
+      - name: rule_id
+        description: Stable identifier of the fincrime rule.
+        data_tests:
+          - not_null
+      - name: rule_name
+        description: Human-readable name of the fincrime rule.
+      - name: rule_category
+        description: Category or grouping of the fincrime rule.
+      - name: total_rule_executions
+        description: Total number of times the rule executed on the day.
+        data_tests:
+          - not_null
+      - name: total_rule_failures
+        description: Number of executions where the rule result was FAIL.
+      - name: total_rule_passes
+        description: Number of executions where the rule result was PASS.
+      - name: total_rule_errors
+        description: Number of executions where the rule result was ERROR.
+      - name: total_reviewed_executions
+        description: Number of rule executions that received a human review outcome.
+      - name: total_false_positives
+        description: >
+          Count of reviewed executions classified as FALSE_POSITIVE.
+          High values indicate the rule may be too sensitive and generating operational noise.
+      - name: total_true_positives
+        description: >
+          Count of reviewed executions classified as TRUE_POSITIVE.
+          High values indicate the rule is correctly identifying risky cases.
+      - name: total_inconclusive_reviews
+        description: Count of reviewed executions classified as INCONCLUSIVE.
+      - name: false_positive_rate_pct
+        description: Percentage of reviewed executions that were classified as false positives.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
+      - name: avg_minutes_to_review
+        description: Average number of minutes between rule execution and human review outcome.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 43200
+
+
+  - name: fact_daily_fincrime_task_pipeline
+    description: >
+      Final mart for Fincrime task pipeline analysis.
+      Provides a daily matrix of system decisions (workflow_execution_result)
+      vs human outcomes (resolution), enabling analysis of operational efficiency
+      and rule effectiveness.
+
+      **Grain:**
+      1 row per (task_created_date, task_type, primary_entity_type, resolution, workflow_execution_result)
+
+      **Business Requirements Met:**
+      - Daily Volume: Count of tasks created per day
+      - Efficiency: Resolution rate and average resolution time (MTTR)
+      - Correlation: Identification of false positives and true positives
+
+      **Assumptions:**
+      - 'FAIL' workflow results indicate flagged cases requiring review
+      - 'APPROVED' after 'FAIL' = false positive (rule too sensitive)
+      - 'REJECTED' after 'FAIL' = true positive (rule correctly flagged risk)
+      - NULL resolution indicates task still pending
+
+    columns:
+      - name: kpi_report_pk
+        description: "Primary Key. Hash of (date, task_type, entity_type, resolution, system_result)."
+        data_tests:
+          - unique
+          - not_null
+      - name: task_created_date
+        description: Date the manual review task was created.
+        data_tests:
+          - not_null
+      - name: task_type
+        description: Category of task (e.g. KYC_CHECK, TRANSACTION_REVIEW).
+      - name: primary_entity_type
+        description: Indicates whether the task relates to a USER or TRANSACTION.
+      - name: resolution
+        description: >
+          Outcome chosen by the human operator (APPROVED, REJECTED, ESCALATED).
+          NULL indicates task is still pending.
+      - name: workflow_execution_result
+        description: Original system decision (e.g. PASS, FAIL).
+      - name: total_tasks_created
+        description: Total number of tasks created for the grouping.
+        data_tests:
+          - not_null
+      - name: total_tasks_resolved
+        description: Number of tasks that reached a resolved state.
+      - name: resolution_rate
+        description: Proportion of tasks resolved out of total created.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1
+      - name: avg_minutes_to_resolution
+        description: Mean time to resolution (MTTR) for resolved tasks.
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 43200
+      - name: total_false_positives
+        description: >
+          Count of FAIL system flags that were later APPROVED by humans.
+          Indicates overly sensitive rules.
+      - name: total_true_positives
+        description: >
+          Count of FAIL system flags that were REJECTED by humans.
+          Indicates correct rule behavior.

@@ -1,0 +1,120 @@
+version: 2
+
+models:
+  - name: int_backend__disbursement_attempts_reporting
+    description: >
+      Intermediate reporting model for disbursement attempts used to support
+      provider success rate, processing duration, and time band analysis.
+      Each row represents the latest known state of a disbursement attempt.
+
+    columns:
+      - name: disbursement_attempt_id
+        description: Unique identifier for the disbursement attempt.
+        data_tests:
+          - not_null
+          - unique
+      - name: disbursement_id
+        description: Identifier of the parent disbursement.
+        data_tests:
+          - not_null
+      - name: disbursement_provider
+        description: Name of the payout provider handling the disbursement attempt.
+      - name: disbursement_attempt_state
+        description: Latest known state of the disbursement attempt.
+      - name: metric_date
+        description: Date derived from the disbursement attempt creation timestamp for daily reporting.
+        data_tests:
+          - not_null
+      - name: disbursement_attempt_created_at
+        description: Timestamp when the disbursement attempt was initiated.
+      - name: disbursement_attempt_updated_at
+        description: Timestamp of the latest known state change for the disbursement attempt.
+      - name: minutes_to_latest_state
+        description: Number of minutes between attempt creation and the latest known state update.
+      - name: minutes_to_complete
+        description: Number of minutes between attempt creation and completion for completed attempts.
+      - name: minutes_to_fail
+        description: Number of minutes between attempt creation and failure for failed attempts.
+      - name: processing_time_band
+        description: Time band classification based on minutes from creation to latest known state update.
+
+
+  - name: int_backend__transactions_reporting
+    description: >
+      Intermediate transaction reporting model used to prepare corridor and date level
+      attributes required for transaction success rate metrics. Each row represents
+      a single transaction enriched with source and destination country context.
+
+    columns:
+      - name: transaction_id
+        description: Unique identifier of the transaction.
+        data_tests:
+          - not_null
+          - unique
+      - name: metric_date
+        description: Date derived from the transaction creation timestamp used for daily reporting metrics.
+        data_tests:
+          - not_null
+      - name: source_country
+        description: Country of the sending user derived from the user profile.
+      - name: destination_country
+        description: Destination country derived from the recipient payout account.
+      - name: corridor
+        description: Payment corridor constructed as source_country-destination_country.
+      - name: transaction_type
+        description: Type of transaction indicating the operational workflow executed.
+      - name: transaction_state
+        description: Current lifecycle state of the transaction.
+      - name: sent_amount
+        description: Amount sent in the source currency.
+      - name: sent_currency
+        description: ISO currency code of the sent amount.
+      - name: received_amount
+        description: Amount received in the destination currency.
+      - name: received_currency
+        description: ISO currency code of the received amount.
+      - name: transaction_created_at
+        description: Timestamp when the transaction was created.
+
+  - name: int_backend__user_onboarding
+    description: >
+      Intermediate user onboarding model at one row per user. This model combines
+      backend registration and approval timestamps with Amplitude onboarding
+      milestones to support signup, activation, and onboarding funnel marts.
+
+    columns:
+      - name: user_id
+        description: Unique identifier for the user.
+        data_tests:
+          - not_null
+          - unique
+      - name: sender_country
+        description: Country code of the sender captured on the backend user profile.
+      - name: signed_up_at
+        description: Timestamp when the user registered in the backend system.
+        data_tests:
+          - not_null
+      - name: signup_date
+        description: Date derived from the backend registration timestamp for daily signup reporting.
+        data_tests:
+          - not_null
+      - name: kyc_approved_at
+        description: Timestamp when the user was approved to transact after KYC.
+      - name: amplitude_signup_at
+        description: Earliest Amplitude timestamp for the sign_up.completed event for the user.
+      - name: first_transaction_at
+        description: Earliest Amplitude timestamp for the transaction.completed event for the user.
+      - name: activation_date
+        description: Date derived from the first completed transaction timestamp.
+      - name: signup_to_first_transaction_hours
+        description: "Latency metric: Hours between backend creation and first successful Amplitude transaction."
+        data_data_tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0" # Sanity check: Can't activate before you sign up
+      - name: is_activated
+        description: "Binary flag (1/0) indicating if the user has completed at least one transaction."
+        data_data_tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: is_kyc_approved
+        description: Flag indicating whether the user has been approved to transact after KYC.

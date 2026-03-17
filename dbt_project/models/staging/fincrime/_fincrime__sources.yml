@@ -1,0 +1,214 @@
+version: 2
+
+models:
+  - name: stg_fincrime__rules
+    description: >
+      Standardised financial crime rule definitions from the fincrime service.
+      Each record represents a versioned rule used by the detection engine to
+      evaluate users or transactions.
+    columns:
+      - name: rule_id
+        description: Unique identifier for the rule version (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: rule_name
+        description: Machine-readable rule name.
+      - name: rule_title
+        description: Human-readable title describing the rule.
+      - name: rule_description
+        description: Detailed explanation of the rule's detection logic.
+      - name: rule_type
+        description: Type of rule logic implemented.
+      - name: rule_category
+        description: Detection category associated with the rule.
+      - name: rule_team
+        description: Team responsible for maintaining the rule.
+      - name: rule_condition
+        description: Expression defining the rule logic.
+      - name: rule_version
+        description: Version number of the rule definition.
+        data_tests:
+          - not_null
+      - name: created_at
+        description: Timestamp when the rule version was created.
+        data_tests:
+          - not_null
+      - name: updated_at
+        description: Timestamp of the most recent update.
+      - name: deleted_at
+        description: Timestamp when the rule version was soft-deleted.
+
+
+  - name: stg_fincrime__workflows
+    description: >
+      Standardised workflow definitions from the fincrime service.
+      Workflows represent ordered collections of rules evaluated during
+      financial crime checks.
+    columns:
+      - name: workflow_id
+        description: Unique identifier for the workflow version (UUID).
+        data_tests:
+          - not_null
+          - unique
+      - name: workflow_name
+        description: Machine-readable workflow name.
+      - name: workflow_title
+        description: Human-readable title of the workflow.
+      - name: workflow_type
+        description: Type of workflow execution context.
+      - name: workflow_config
+        description: JSON configuration describing the workflow rule graph.
+      - name: workflow_version
+        description: Version number of the workflow definition.
+        data_tests:
+          - not_null
+      - name: created_at
+        description: Timestamp when the workflow version was created.
+        data_tests:
+          - not_null
+      - name: updated_at
+        description: Timestamp of the most recent update.
+      - name: deleted_at
+        description: Timestamp when the workflow version was soft-deleted.
+
+
+  - name: stg_fincrime__workflow_rules
+    description: >
+      Mapping table linking workflows to their constituent rules.
+    columns:
+      - name: workflow_id
+        description: Identifier of the workflow containing the rule.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__workflows')
+              field: workflow_id
+      - name: rule_id
+        description: Identifier of the rule included in the workflow.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__rules')
+              field: rule_id
+
+
+  - name: stg_fincrime__workflow_executions
+    description: >
+      Standardised workflow execution records from the fincrime service.
+      Each row represents one execution of a rule workflow triggered by a
+      business event such as a transaction or user onboarding.
+    columns:
+      - name: workflow_execution_id
+        description: Unique identifier for the workflow execution.
+        data_tests:
+          - not_null
+          - unique
+      - name: workflow_id
+        description: Identifier of the workflow that was executed.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__workflows')
+              field: workflow_id
+      - name: workflow_execution_result
+        description: Overall result of the workflow execution.
+      - name: workflow_execution_context
+        description: Raw JSON context describing the evaluated entity.
+      - name: user_id
+        description: Identifier of the user evaluated in the workflow execution.
+      - name: transaction_id
+        description: Identifier of the transaction evaluated in the workflow execution.
+      - name: created_at
+        description: Timestamp when the workflow execution was created.
+        data_tests:
+          - not_null
+      - name: started_at
+        description: Timestamp when workflow evaluation began.
+      - name: ended_at
+        description: Timestamp when workflow evaluation completed.
+      - name: workflow_execution_error
+        description: Error message recorded if execution failed.
+      - name: workflow_execution_actions
+        description: JSON array of actions triggered by the workflow.
+
+
+  - name: stg_fincrime__rule_executions
+    description: >
+      Standardised rule execution records from the fincrime service.
+      Each row represents the evaluation of a single rule within a workflow execution.
+    columns:
+      - name: rule_execution_id
+        description: Unique identifier for the rule execution.
+        data_tests:
+          - not_null
+          - unique
+      - name: rule_id
+        description: Identifier of the rule evaluated.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__rules')
+              field: rule_id
+      - name: workflow_execution_id
+        description: Identifier of the workflow execution this rule belongs to.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__workflow_executions')
+              field: workflow_execution_id
+      - name: rule_execution_result
+        description: Result of the rule evaluation.
+      - name: condition_result
+        description: Raw evaluation result of the rule condition.
+      - name: rule_execution_context
+        description: JSON context describing the evaluated entity.
+      - name: user_id
+        description: Identifier of the evaluated user.
+      - name: transaction_id
+        description: Identifier of the evaluated transaction.
+      - name: created_at
+        description: Timestamp when the rule evaluation started.
+        data_tests:
+          - not_null
+      - name: started_at
+        description: Timestamp when rule condition evaluation began.
+      - name: ended_at
+        description: Timestamp when rule condition evaluation completed.
+      - name: rule_execution_error
+        description: Error message recorded if evaluation failed.
+      - name: rule_review_status
+        description: Status of the rule review process.
+      - name: review_comment
+        description: Comment added by the reviewer.
+      - name: reviewer_id
+        description: Identifier of the staff member who reviewed the rule execution.
+      - name: reviewed_at
+        description: Timestamp when the review was completed.
+
+
+  - name: stg_fincrime__rule_execution_reviews
+    description: >
+      Standardised rule execution review records from the fincrime service.
+      These represent manual determinations made by the financial crime operations team.
+    columns:
+      - name: rule_execution_review_id
+        description: Unique identifier for the review record.
+        data_tests:
+          - not_null
+          - unique
+      - name: rule_execution_id
+        description: Identifier of the rule execution being reviewed.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_fincrime__rule_executions')
+              field: rule_execution_id
+      - name: reviewer_id
+        description: Identifier of the staff member performing the review.
+      - name: review_outcome
+        description: Determination of the review outcome.
+      - name: review_comment
+        description: Detailed explanation of the review decision.
+      - name: reviewed_at
+        description: Timestamp when the review was completed.
