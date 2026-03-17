@@ -77,10 +77,13 @@ Fintech workflows are asynchronous:
 
 To support idempotent loading and high-performance joins, every Mart model utilizes a deterministic **Surrogate Key (`kpi_report_pk`)**.
 
-* **Method:** `HASH()` of the aggregation grain (e.g., `date`, `provider`, `corridor`).
-* **Benefits:** 1.  Ensures a single `unique_key` for dbt incremental logic.
-2.  Provides a singular "handle" for debugging data collisions.
-3.  Optimizes Snowflake's join engine compared to multi-column joins.
+### Method:
+* ** `HASH()` of the aggregation grain (e.g., `date`, `provider`, `corridor`).
+### Benefits
+
+1. Enables `unique_key` for dbt incremental models  
+2. Simplifies debugging and traceability  
+3. Improves join performance vs multi-column joins 
 
 ## 5. Cross-Source Enrichment (Requirement 4)
 
