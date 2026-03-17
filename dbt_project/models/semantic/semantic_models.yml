@@ -1,0 +1,166 @@
+version: 2
+
+semantic_models:
+
+  # 1. Finance & Ops: Corridor Performance (Transactions cleared by workflow)
+  - name: corridor_performance
+    description: >
+      Semantic layer for transaction corridor performance.
+      Exposes transaction volume and success metrics by corridor and date.
+    model: ref('fact_daily_corridor_success_rate')
+    defaults:
+      agg_time_dimension: metric_date
+
+    entities:
+      # Primary key at the grain level
+      - name: corridor_kpi
+        type: primary
+        expr: kpi_report_pk
+
+      # Natural business entity
+      - name: corridor
+        type: natural
+        expr: corridor
+
+    dimensions:
+      - name: metric_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: source_country
+        type: categorical
+      - name: destination_country
+        type: categorical
+      - name: corridor
+        type: categorical
+
+    measures:
+      # Total attempted transactions
+      - name: total_attempt_transactions
+        agg: sum
+        expr: total_attempt_transactions
+
+      # Transactions that passed workflow checks
+      - name: successful_passes
+        agg: sum
+        expr: successful_passes
+
+
+  # 2. Fincrime: Rule Performance (System vs Human review quality)
+  - name: fincrime_rule_performance
+    description: >
+      Semantic layer for fincrime rule performance.
+      Enables tracking of rule execution volume and rule quality via human review outcomes.
+    model: ref('fact_daily_rule_performance')
+    defaults:
+      agg_time_dimension: metric_date
+
+    entities:
+      - name: rule_kpi
+        type: primary
+        expr: kpi_report_pk
+
+      # Rule as a reusable business entity
+      - name: rule
+        type: natural
+        expr: rule_id
+
+    dimensions:
+      - name: metric_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: rule_name
+        type: categorical
+      - name: rule_category
+        type: categorical
+
+    measures:
+      # Total rule executions
+      - name: total_rule_executions
+        agg: sum
+        expr: total_rule_executions
+
+      # Only executions that reached human review
+      - name: total_reviewed_executions
+        agg: sum
+        expr: total_reviewed_executions
+
+      # Cases where rule flagged but human cleared
+      - name: total_false_positives
+        agg: sum
+        expr: total_false_positives
+
+
+  # 3. Growth: User Onboarding Funnel
+  - name: user_onboarding
+    description: >
+      Semantic layer for user onboarding lifecycle.
+      Enables analysis of signup volume and time-to-activation efficiency.
+    model: ref('dim_users')
+    defaults:
+      agg_time_dimension: signup_date
+
+    entities:
+      # User-level primary entity
+      - name: user
+        type: primary
+        expr: user_id
+
+    dimensions:
+      - name: signup_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: activation_status
+        type: categorical
+      - name: sender_country
+        type: categorical
+
+    measures:
+      # Count of users signing up
+      - name: total_signups
+        agg: count
+        expr: user_id
+
+      # Average time to first transaction (activation)
+      - name: signup_to_first_transaction_hours
+        agg: sum
+        expr: signup_to_first_transaction_hours
+
+
+# =========================
+# METRICS (Business-facing)
+# =========================
+
+metrics:
+
+  # Corridor-level success rate
+  - name: transaction_success_rate
+    description: >
+      Percentage of transactions that passed workflow checks successfully.
+    type: ratio
+    type_params:
+      numerator: successful_passes
+      denominator: total_attempt_transactions
+
+
+  # Rule quality metric (noise level)
+  - name: rule_false_positive_rate
+    description: >
+      Percentage of reviewed rule executions that were false positives.
+      Indicates how often rules flag non-risky cases.
+    type: ratio
+    type_params:
+      numerator: total_false_positives
+      denominator: total_reviewed_executions
+
+
+  # Onboarding efficiency metric
+  - name: avg_time_to_activate
+    description: >
+      Average time (in hours) from user signup to first successful transaction.
+    type: average
+    type_params:
+      measure:
+        name: signup_to_first_transaction_hours
