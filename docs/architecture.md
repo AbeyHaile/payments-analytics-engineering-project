@@ -78,7 +78,7 @@ Fintech workflows are asynchronous:
 To support idempotent loading and high-performance joins, every Mart model utilizes a deterministic **Surrogate Key (`kpi_report_pk`)**.
 
 ### Method:
-* ** `HASH()` of the aggregation grain (e.g., `date`, `provider`, `corridor`).
+* `HASH()` of the aggregation grain (e.g., `date`, `provider`, `corridor`).
 ### Benefits
 
 1. Enables `unique_key` for dbt incremental models  
@@ -87,10 +87,24 @@ To support idempotent loading and high-performance joins, every Mart model utili
 
 ## 5. Cross-Source Enrichment (Requirement 4)
 
-The mapping between **Fincrime Workflows** and **Backend Tasks** is a core challenge addressed in the Intermediate layer.
+A key challenge is linking:
 
-* **Entity Resolution:** We extract polymorphic identifiers (Transaction IDs vs. User IDs) from JSON metadata to link manual human actions in the Backend to the automated triggers in the Fincrime system.
-* **Join Logic:** We prioritize Transaction-level matches over User-level matches using `QUALIFY ROW_NUMBER()` to ensure the most granular correlation is preserved.
+- **Fincrime workflows (automated decisions)**
+- **Backend tasks (manual interventions)**
+
+### Approach
+
+- Extract identifiers from JSON metadata:
+  - `transaction_id`
+  - `user_id`
+- Perform entity resolution in **Intermediate layer**
+
+### Join Strategy
+
+- Prioritize **transaction-level matches**
+- Fallback to **user-level matches**
+- Join Strategy:** I prioritize **Transaction-level matches**
+- Fallback to **User-level matches** using `QUALIFY ROW_NUMBER()` to ensure the most granular correlation is preserved.
 
 ## 6. Testing & Quality Standards
 
