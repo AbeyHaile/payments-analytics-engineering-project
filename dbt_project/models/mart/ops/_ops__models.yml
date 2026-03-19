@@ -75,6 +75,14 @@ models:
         description: Count of attempts completed or failed in 1 to 24 hours.
       - name: attempts_over_24_hours
         description: Count of attempts completed or failed in over 24 hours.
+        data_tests:
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: total_attempts
+          column_B: total_successes
+
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: total_attempts
+          column_B: total_failures
 
 
   - name: fact_daily_corridor_success_rate
