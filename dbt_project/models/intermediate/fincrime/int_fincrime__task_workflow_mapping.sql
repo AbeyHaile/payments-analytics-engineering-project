@@ -27,7 +27,8 @@ workflows AS (
         transaction_id,
         user_id,
         created_at AS workflow_created_at
-    FROM {{ ref('stg_fincrime__workflow_executions') }}
+    FROM
+        {{ ref('stg_fincrime__workflow_executions') }}
 )
 
 SELECT

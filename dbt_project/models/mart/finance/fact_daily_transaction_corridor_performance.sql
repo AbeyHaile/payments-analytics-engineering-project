@@ -15,9 +15,13 @@ WITH daily_stats AS (
         SUM(CASE WHEN transaction_state = 'COMPLETED' THEN sent_amount ELSE 0 END) AS completed_transaction_volume
     FROM {{ ref('int_backend__transactions_joined') }}
     WHERE transaction_type IN ('DISBURSEMENT', 'CONVERSION_DISBURSEMENT', 'COLLECTION_CONVERSION_DISBURSEMENT')
+    
     {% if is_incremental() %}
-    AND updated_at >= DATEADD('day', -3, CURRENT_DATE)
+    AND updated_at >= DATEADD('day', -3, MAX(updated_at))
+        FROM {{ this }}
+    )
     {% endif %}
+
     GROUP BY 
         metric_date,
         source_country,

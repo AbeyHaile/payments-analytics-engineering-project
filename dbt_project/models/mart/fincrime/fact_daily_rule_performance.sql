@@ -20,9 +20,15 @@ WITH daily_rules AS (
         COUNT(CASE WHEN execution_status_category = 'REVIEW_INCONCLUSIVE' THEN 1 END) AS total_inconclusive_reviews,
         AVG(minutes_to_review) AS avg_minutes_to_review
     FROM {{ ref('int_fincrime__rule_executions_enriched') }}
+    
     {% if is_incremental() %}
-    WHERE rule_execution_created_at >= DATEADD('day', -3, CURRENT_DATE)
+   
+    WHERE rule_execution_created_at >= (
+        SELECT DATEADD('day', -3, MAX(rule_execution_created_at))
+        FROM {{ this }}
+    )
     {% endif %}
+
     GROUP BY
         metric_date,
         rule_id,
