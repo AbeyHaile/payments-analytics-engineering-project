@@ -18,7 +18,7 @@ To review the specific deliverables for the Senior Analytics Engineer assessment
 
 ### 📖 Documentation & Strategy
 * **[Architecture Decision Log](docs/architecture.md)**: Detailed reasoning for Snowflake provisioning, `delete+insert` incremental strategies, and the 3-day lookback logic.
-* **[AI Agent Handbook (AGENTS.md)](AGENTS.md)**: Operational instructions and standards for AI agents interacting with this repository.
+* **[AI Agent Handbook (AGENTS.md)](agent.md)**: Operational instructions and standards for AI agents interacting with this repository.
 * **[AI Prompt Log (PROMPT_LOG.md)](prompt_log.md)**: A transparent record of AI collaboration used to develop this project (Deliverable 3).
 
 ### 📊 Requirement Mapping (Models)
@@ -142,5 +142,6 @@ The project is intentionally **not runnable** because:
 - The objective of the assessment is to evaluate architecture, modelling, and documentation rather than executable pipelines.
 
 All models are written as they would appear in a **production dbt project**.
+
 
 
