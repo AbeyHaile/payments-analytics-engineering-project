@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='user_id',
-    incremental_strategy='delete+insert'
+    incremental_strategy='delete+insert',
+    unique_key='user_id'
 ) }}
 
 SELECT

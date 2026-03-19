@@ -1,7 +1,5 @@
 {{ config(
-    materialized='incremental',
-    unique_key='kpi_report_pk',
-    incremental_strategy='delete+insert'
+    unique_key='kpi_report_pk'
 ) }}
 
 WITH corridor_stats AS (

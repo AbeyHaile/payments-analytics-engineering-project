@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
+    incremental_strategy='merge',
     unique_key='workflow_execution_id',
-    incremental_strategy='merge'
 ) }}
 
 WITH workflows AS (

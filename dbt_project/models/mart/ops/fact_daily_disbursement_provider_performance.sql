@@ -1,8 +1,5 @@
 {{ config(
-    materialized='incremental',
-    incremental_strategy='delete+insert',
-    unique_key='kpi_report_pk',
-    tags=['daily']
+    unique_key='kpi_report_pk'
 ) }}
 
 WITH provider_stats AS (

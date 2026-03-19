@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='rule_execution_id',
-    incremental_strategy='merge'
+    incremental_strategy='merge',
+    unique_key='rule_execution_id'
 ) }}
 
 WITH current_rules AS (

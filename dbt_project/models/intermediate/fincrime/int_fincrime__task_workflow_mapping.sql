@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='task_id',
-    incremental_strategy='merge'
+    incremental_strategy='merge',
+    unique_key='task_id'
 ) }}
 
 WITH tasks AS (
