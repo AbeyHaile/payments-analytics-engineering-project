@@ -11,7 +11,8 @@ WITH daily_stats AS (
         COUNT(transaction_id) AS qualifying_transaction_attempts,
         COUNT(CASE WHEN transaction_state = 'COMPLETED' THEN transaction_id END) AS completed_qualifying_transactions,
         SUM(CASE WHEN transaction_state = 'COMPLETED' THEN sent_amount ELSE 0 END) AS completed_transaction_volume
-    FROM {{ ref('int_backend__transactions_joined') }}
+    FROM 
+        {{ ref('int_backend__transactions_joined') }}
     WHERE transaction_type IN ('DISBURSEMENT', 'CONVERSION_DISBURSEMENT', 'COLLECTION_CONVERSION_DISBURSEMENT')
     
     {% if is_incremental() %}

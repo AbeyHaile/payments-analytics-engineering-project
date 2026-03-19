@@ -17,7 +17,8 @@ WITH transactions AS (
         received_currency,
         created_at,
         updated_at
-    FROM {{ ref('stg_backend__transactions') }}
+    FROM 
+        {{ ref('stg_backend__transactions') }}
 
     {% if is_incremental() %}
         WHERE updated_at >= (
@@ -33,7 +34,8 @@ users AS (
     SELECT
         user_id,
         sender_country
-    FROM {{ ref('stg_backend__users') }}
+    FROM
+        {{ ref('stg_backend__users') }}
 
 ),
 
@@ -42,7 +44,8 @@ recipient_accounts AS (
     SELECT
         recipient_account_id,
         country
-    FROM {{ ref('stg_backend__transactions_recipient_account') }}
+    FROM
+        {{ ref('stg_backend__transactions_recipient_account') }}
 
 )
 
@@ -59,7 +62,8 @@ SELECT
     t.received_amount,
     t.received_currency,
     t.created_at AS transaction_created_at
-FROM transactions t
+FROM 
+    transactions t
 LEFT JOIN users u
     ON t.user_id = u.user_id
 LEFT JOIN recipient_accounts ra

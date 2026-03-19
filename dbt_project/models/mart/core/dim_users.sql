@@ -16,6 +16,9 @@ SELECT
     registration_to_account_minutes AS signup_to_first_transaction_hours 
 FROM 
     {{ ref('int_backend__user_onboarding') }}
+
 {% if is_incremental() %}
-WHERE user_created_at >= DATEADD('day', -3, CURRENT_DATE)
+AND user_created_at >= DATEADD('day', -3, MAX(user_created_at))
+    FROM {{ this }}
+)
 {% endif %}

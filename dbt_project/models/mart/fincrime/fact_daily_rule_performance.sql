@@ -17,7 +17,8 @@ WITH daily_rules AS (
         COUNT(CASE WHEN execution_status_category = 'CONFIRMED_FRAUD' THEN 1 END) AS total_true_positives,
         COUNT(CASE WHEN execution_status_category = 'REVIEW_INCONCLUSIVE' THEN 1 END) AS total_inconclusive_reviews,
         AVG(minutes_to_review) AS avg_minutes_to_review
-    FROM {{ ref('int_fincrime__rule_executions_enriched') }}
+    FROM 
+        {{ ref('int_fincrime__rule_executions_enriched') }}
     
     {% if is_incremental() %}
    
