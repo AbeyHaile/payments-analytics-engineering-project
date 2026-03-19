@@ -1,3 +1,7 @@
+{{ config(
+    tags=['daily']
+) }}
+
 SELECT
     id AS task_id,
     service,
