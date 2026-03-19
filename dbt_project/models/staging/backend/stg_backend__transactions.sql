@@ -1,6 +1,10 @@
-{{ CONFIG(
-    TAGS=['hourly']
-) }}
+{{
+    config(
+        materialized='incremental',
+        incremental_strategy='append',
+        tags=['daily']
+    )
+}}
 
 SELECT
     id AS transaction_id,

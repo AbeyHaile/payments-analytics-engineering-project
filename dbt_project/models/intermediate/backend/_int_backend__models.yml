@@ -76,6 +76,7 @@ models:
       - name: transaction_created_at
         description: Timestamp when the transaction was created.
 
+
   - name: int_backend__user_onboarding
     description: >
       Intermediate user onboarding model at one row per user. This model combines
