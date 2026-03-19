@@ -14,11 +14,6 @@ require-dbt-version: [">=1.0.0", "<2.0.0"]
 # The `model-paths` config, for example, states that models in this project can be
 # found in the "models/" directory.
 model-paths: ["dbt_project/models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
 
 # directories to be removed by `dbt clean`
 clean-targets:
