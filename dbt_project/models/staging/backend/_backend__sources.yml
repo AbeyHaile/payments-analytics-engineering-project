@@ -1,7 +1,6 @@
 version: 2
 
 models:
-
   - name: stg_backend__collection_payment_attempts
     description: >
       Standardised payment attempt records from the backend application source.
@@ -12,7 +11,6 @@ models:
         description: Identifier of the parent collection this payment attempt belongs to.
         data_tests:
           - not_null
-          - Unique
           - relationships:
               to: ref('stg_backend__transactions_collection')
               field: collection_id
@@ -65,7 +63,7 @@ models:
         description: Timestamp of the most recent state change.
 
 
-  - name: stg_backend__disbursement_attempts
+  - name: stg_backend__disbursements
     description: >
       Standardised disbursement records from the backend application source.
       This staging model preserves a 1:1 relationship with the upstream table
@@ -138,7 +136,7 @@ models:
         data_tests:
           - not_null
           - relationships:
-              to: ref('stg_backend__transactions_disbursement')
+              to: ref('stg_backend__disbursements')
               field: disbursement_id
       - name: error
         description: Error message returned by the provider when the attempt fails.
@@ -445,8 +443,6 @@ models:
         description: Timestamp when the recipient record was created.
       - name: provider_name
         description: Name of the payout provider associated with the recipient.
-      - name: recipient_name
-        description: Display name assigned to the recipient.
       - name: recipient_type
         description: Type of recipient destination.
         data_tests:
@@ -546,7 +542,6 @@ models:
         description: Raw JSON containing user preferences and intended platform usage.
 
 
-models:
   - name: stg_backend__users_account
     description: >
       Standardised account records from the backend application source.
