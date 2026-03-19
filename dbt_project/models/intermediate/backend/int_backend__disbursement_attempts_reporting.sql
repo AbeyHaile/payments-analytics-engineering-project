@@ -25,6 +25,7 @@ WITH attempt AS (
 )
 
 SELECT
+    
     disbursement_attempt_id,
     disbursement_id,
     disbursement_provider,
@@ -41,6 +42,8 @@ SELECT
         WHEN disbursement_attempt_state = 'FAILED'
             THEN DATEDIFF('minute', created_at, updated_at)
     END AS minutes_to_fail,
+    
+    -- Operational Time Bands
     CASE
         WHEN DATEDIFF('minute', created_at, updated_at) < 1 THEN 'under_1_minute'
         WHEN DATEDIFF('minute', created_at, updated_at) <= 5 THEN '1_to_5_minutes'
