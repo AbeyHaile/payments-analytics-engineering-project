@@ -9,14 +9,10 @@ models:
       and provides a clean schema for downstream transformations.
     columns:
       - name: collection_id
-        description: Unique identifier for the payment collection attempt (UUID).
-        data_tests:
-          - not_null
-          - unique
-      - name: collection_id
         description: Identifier of the parent collection this payment attempt belongs to.
         data_tests:
           - not_null
+          - Unique
           - relationships:
               to: ref('stg_backend__transactions_collection')
               field: collection_id
@@ -69,7 +65,7 @@ models:
         description: Timestamp of the most recent state change.
 
 
-  - name: stg_backend__disbursement
+  - name: stg_backend__disbursement_attempts
     description: >
       Standardised disbursement records from the backend application source.
       This staging model preserves a 1:1 relationship with the upstream table
