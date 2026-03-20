@@ -5,7 +5,8 @@ This document records the substantive AI prompts used to support the completion 
 ## 1. Repository and Deliverables Structure
 
 **Prompt**
-> I want to share my task as a GitHub repo. I want to create a README file, a source-to-target mapping document, a POC document for the requests from finance and other stakeholders, and YAML documentation for each model. Here is the design of course needs updating:
+> I want to share my task as a GitHub repo. I want to create a README file, a source-to-target mapping document, a POC document for the requests from finance and other stakeholders, and YAML documentation for each model. Here is the design of course needs updating.
+> All outputs must be cross-validated against the information provided in the take-home task. Do not introduce assumptions that contradict the source material unless explicitly instructed.
 >
 > `nala-analytics-assessment/`
 > `├── dbt_project/`
@@ -45,7 +46,7 @@ This document records the substantive AI prompts used to support the completion 
 ## 4. Architecture Document Structure
 
 **Prompt**
-> Architecture Document created in docs and paste the subtitles.
+> Noe, let's create the Architecture Document in docs with clear subtitles.
 
 **How it was used**
 - Helped establish the structure of `docs/architecture.md`
@@ -74,6 +75,10 @@ This document records the substantive AI prompts used to support the completion 
 - Refined the scope of the mapping from raw-source lineage to analytics-layer lineage
 - Shifted the focus toward dbt staging models, analytics marts, and semantic outputs
 - Helped align the mapping with the actual assessment deliverables rather than generic ingestion lineage
+
+**Final Decision**
+- Not included, as it falls outside the scope of the assessment deliverables
+- All lineage and transformation logic are instead documented directly within dbt models and YAML files to keep the project self-contained
 
 ---
 
