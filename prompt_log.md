@@ -8,11 +8,11 @@ This document records the substantive AI prompts used to support the completion 
 > I want to share my task as a GitHub repo. I want to create a README file, a source-to-target mapping document, a POC document for the requests from finance and other stakeholders, and YAML documentation for each model. Here is the design of course needs updating.
 > All outputs must be cross-validated against the information provided in the senior_ae_take_home doc. Do not introduce assumptions that contradict the source material unless explicitly instructed.
 ```
-`nala-analytics-assessment/`
- `├── dbt_project/`
- `├── docs/`
- `├── README.md`
- `└── .gitignore`
+nala-analytics-assessment/
+ ├── dbt_project/
+ ├── docs/
+ ├── README.md
+ └── .gitignore
 ```
 
 **How it was used**
