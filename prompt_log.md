@@ -27,8 +27,6 @@ This document records the substantive AI prompts used to support the completion 
 
 **How it was used**
 - Helped define the execution note in the README
-- Clarified that the submission should be presented as a design and architecture artefact rather than an executable project
-- Informed the wording used to explain why real source systems and datasets were not included
 
 ---
 
