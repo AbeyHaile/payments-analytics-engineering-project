@@ -16,7 +16,7 @@ This document records the substantive AI prompts used to support the completion 
 **How it was used**
 - Helped define the initial repository structure
 - Shaped the decision to separate documentation from dbt assets
-- Led to the addition of dedicated files such as `architecture.md`, `source_to_target_mapping.md`, `poc_requirements.md`, and `prompt_log.md`
+- Led to the addition of dedicated files such as `architecture.md`, `source_to_target_mapping.md`, and `prompt_log.md`
 
 ---
 
