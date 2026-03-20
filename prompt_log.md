@@ -13,6 +13,9 @@ nala-analytics-assessment/
  ├── docs/
  ├── README.md
  └── .gitignore
+ └── assessment
+ └── agent.md
+ └── promtpt_log.md
 ```
 
 **How it was used**
