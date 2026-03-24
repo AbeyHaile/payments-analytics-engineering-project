@@ -5,7 +5,7 @@ name: 'nala_analytics_assessment'
 version: '1.0.0'
 
 # Select the dbt profile used for the project.
-profile: "nala_analytics_assessment"
+profile: "snowflake"
 
 # Select the required dbt version to run models
 require-dbt-version: [">=1.0.0", "<2.0.0"]
