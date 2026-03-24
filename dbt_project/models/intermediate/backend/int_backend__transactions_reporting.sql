@@ -52,6 +52,7 @@ recipient_accounts AS (
 SELECT
     t.transaction_id,
     DATE(t.created_at) AS metric_date,
+    t.updated_at,
     u.sender_country AS source_country,
     ra.country AS destination_country,
     CONCAT(u.sender_country, '-', ra.country) AS corridor,
