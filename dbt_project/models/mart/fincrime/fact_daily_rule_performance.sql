@@ -24,8 +24,7 @@ WITH daily_rules AS (
    
     WHERE rule_execution_created_at >= (
         SELECT DATEADD('day', -3, MAX(rule_execution_created_at))
-        FROM {{ this }}
-    )
+        FROM {{ this }})
     {% endif %}
 
     GROUP BY

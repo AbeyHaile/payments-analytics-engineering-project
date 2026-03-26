@@ -16,8 +16,11 @@ WITH corridor_stats AS (
         {{ ref('int_fincrime__workflow_executions_transactions') }}
 
     {% if is_incremental() %}
-    WHERE workflow_updated_at >= DATEADD('day', -3, MAX(workflow_updated_at))
+        WHERE workflow_updated_at >= (
+            SELECT DATEADD('day', -3, MAX(workflow_updated_at))
+            FROM {{ this }})
     {% endif %}
+
     GROUP BY
         metric_date,
         source_country,

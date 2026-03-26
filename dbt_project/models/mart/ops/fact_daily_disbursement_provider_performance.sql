@@ -28,15 +28,13 @@ WITH provider_stats AS (
 
     {% if is_incremental() %}
         WHERE metric_date >= (
-            SELECT DATEADD('day', -3, MAX(metric_date))
-            FROM {{ this }}
-        )
+            SELECT DATEADD('day', -3, MAX(metric_date)) 
+            FROM {{ this }})
     {% endif %}
 
     GROUP BY
         metric_date,
         disbursement_provider
-
 )
 
 SELECT

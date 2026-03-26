@@ -18,7 +18,8 @@ FROM
     {{ ref('int_backend__user_onboarding') }}
 
 {% if is_incremental() %}
-AND user_created_at >= DATEADD('day', -3, MAX(user_created_at))
-    FROM {{ this }}
-)
+    WHERE user_created_at >= (
+        SELECT DATEADD('day', -3, MAX(user_created_at))
+        FROM {{ this }})
 {% endif %}
+

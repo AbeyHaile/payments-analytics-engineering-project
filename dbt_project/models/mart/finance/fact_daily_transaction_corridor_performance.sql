@@ -14,11 +14,11 @@ WITH daily_stats AS (
     FROM 
         {{ ref('int_backend__transactions_joined') }}
     WHERE transaction_type IN ('DISBURSEMENT', 'CONVERSION_DISBURSEMENT', 'COLLECTION_CONVERSION_DISBURSEMENT')
-    
+
     {% if is_incremental() %}
-    AND updated_at >= DATEADD('day', -3, MAX(updated_at))
-        FROM {{ this }}
-    )
+    WHERE updated_at >= (
+        SELECT DATEADD('day', -3, MAX(updated_at))
+        FROM {{ this }})
     {% endif %}
 
     GROUP BY 

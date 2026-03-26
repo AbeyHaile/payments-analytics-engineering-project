@@ -18,9 +18,9 @@ WITH pipeline AS (
     {% if is_incremental() %}
     WHERE task_created_date >= (
         SELECT DATEADD('day', -3, MAX(task_created_date))
-        FROM {{ this }}
-    )
+        FROM {{ this }})
     {% endif %}
+    
     GROUP BY
         task_created_date,
         primary_entity_type,
