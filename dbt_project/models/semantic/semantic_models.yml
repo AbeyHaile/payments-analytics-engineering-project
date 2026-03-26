@@ -208,7 +208,7 @@ metrics:
         name: signup_to_first_transaction_hours
 
 
-# Transaction performance metric (financial completion)
+ # Transaction performance metric (financial completion)
   - name: completed_transaction_volume
     description: >
       Sum of sent amount for completed, qualifying outbound transactions.
