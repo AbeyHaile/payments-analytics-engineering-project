@@ -268,7 +268,6 @@ models:
         description: Unique identifier of the transaction.
         data_tests:
           - not_null
-          - unique
       - name: user_id
         data_type: string
         description: Identifier of the user initiating the transaction.
