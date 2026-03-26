@@ -50,7 +50,7 @@ SELECT
     ROUND(
         100.0 * total_successes / NULLIF(total_attempts, 0),
         2
-    ) AS disbursement_provider_success_rate_pct,
+    ) AS success_rate_pct,
 
     ROUND(avg_minutes_to_complete, 2) AS avg_minutes_to_complete,
     ROUND(avg_minutes_to_fail, 2) AS avg_minutes_to_fail,

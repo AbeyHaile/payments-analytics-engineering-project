@@ -45,7 +45,7 @@ models:
         description: Number of disbursement attempts that completed successfully.
       - name: total_failures
         description: Number of disbursement attempts that failed.
-      - name: disbursement_provider_success_rate_pct
+      - name: success_rate_pct
         description: Percentage of total attempts that completed successfully.
         data_tests:
           - dbt_expectations.expect_column_values_to_be_between:
