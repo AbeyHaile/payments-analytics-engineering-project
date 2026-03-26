@@ -40,11 +40,7 @@ WITH provider_stats AS (
 )
 
 SELECT
-    {{ dbt_utils.generate_surrogate_key([
-        'metric_date',
-        'disbursement_provider'
-    ]) }} AS kpi_report_pk,
-
+    {{ dbt_utils.generate_surrogate_key(['metric_date','disbursement_provider']) }} AS kpi_report_pk,
     metric_date,
     disbursement_provider,
     total_attempts,
