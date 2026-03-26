@@ -128,6 +128,48 @@ semantic_models:
         agg: sum
         expr: signup_to_first_transaction_hours
 
+# 4. Finance: Transaction Corridor Performance (True payment success)
+  - name: corridor_transaction_performance
+    description: >
+      Semantic layer for true transaction corridor performance.
+      Uses completed transaction lifecycle (not workflow) to measure success and volume.
+    model: ref('fact_daily_transaction_corridor_performance')
+    defaults:
+      agg_time_dimension: metric_date
+
+    entities:
+      - name: corridor_kpi
+        type: primary
+        expr: kpi_report_pk
+
+      - name: corridor
+        type: natural
+        expr: corridor
+
+    dimensions:
+      - name: metric_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: source_country
+        type: categorical
+      - name: destination_country
+        type: categorical
+      - name: corridor
+        type: categorical
+
+    measures:
+      - name: qualifying_transaction_attempts
+        agg: sum
+        expr: qualifying_transaction_attempts
+
+      - name: completed_qualifying_transactions
+        agg: sum
+        expr: completed_qualifying_transactions
+
+      - name: completed_transaction_volume
+        agg: sum
+        expr: completed_transaction_volume
 
 # =========================
 # METRICS (Business-facing)
@@ -164,3 +206,23 @@ metrics:
     type_params:
       measure:
         name: signup_to_first_transaction_hours
+
+
+# Transaction performance metric (financial completion)
+  - name: completed_transaction_volume
+    description: >
+      Sum of sent amount for completed, qualifying outbound transactions.
+    type: simple
+    type_params:
+      measure:
+        name: completed_transaction_volume
+
+
+  - name: transaction_success_rate_true
+    description: >
+      Percentage of qualifying outbound transaction attempts that completed successfully.
+      Based on transaction lifecycle (not workflow).
+    type: ratio
+    type_params:
+      numerator: completed_qualifying_transactions
+      denominator: qualifying_transaction_attempts
