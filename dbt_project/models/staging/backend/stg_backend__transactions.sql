@@ -34,3 +34,7 @@ SELECT
     workflow_id
 FROM 
     {{ SOURCE('backend', 'transactions_transaction') }}
+{% if is_incremental() %}
+  -- This ensures we only append NEW status changes since the last run
+  WHERE updated_at > (SELECT MAX(updated_at) FROM {{ this }})
+{% endif %}
