@@ -31,7 +31,7 @@ To review the specific deliverables for the Senior Analytics Engineer assessment
 | **5. Growth POC** | `dim_users.sql` |
 
 ### 🧠 Semantic Layer
-* **[Semantic Model Definitions](models/semantic/semantic_models.yml)**: MetricFlow definitions for Success Rates, False Positive Rates, and Activation Funnels.
+* **[Semantic Model Definitions](dbt_projects/models/semantic/semantic_models.yml)**: MetricFlow definitions for Success Rates, False Positive Rates, and Activation Funnels.
 
 ## Assessment Instructions
 
