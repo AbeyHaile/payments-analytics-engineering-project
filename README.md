@@ -38,7 +38,7 @@ To review the specific deliverables for the Senior Analytics Engineer assessment
 The original assessment brief provided by NALA is included for reference.
 
 See: `assessment/nala_assessment_instructions.pdf`
-[NALA Assessment Instructions](assessment/senior_ae_take_home.pdf)
+[NALA Assessment Instructions](assessment/analytics_engineering_case_study.pdf)
 
 This repository contains my proposed analytics architecture, dbt project structure, and documentation addressing the requirements outlined in the brief.
 
