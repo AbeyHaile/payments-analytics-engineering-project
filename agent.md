@@ -3,8 +3,9 @@
 
 ## 🤖 AI Agent Onboarding & Project Standards
 
-This document serves as the primary system prompt and instruction set for AI coding agents (e.g., Cursor, GitHub Copilot, Gemini) interacting with the NALA Analytics repository. **All code generation and modification must adhere to these standards.**
+This document defines the standards and conventions for AI coding agents (e.g. Cursor, GitHub Copilot, Gemini) interacting with this analytics engineering project.
 
+All generated or modified code must follow these guidelines to ensure consistency, maintainability, and production readiness.
 ---
 
 ## 1. Core Technical Principles
