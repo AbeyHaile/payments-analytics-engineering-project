@@ -1,8 +1,8 @@
-# NALA Analytics Engineering Assessment
+# End-to-End Analytics Engineering for a Payments Platform
 
-This repository contains my solution for the **NALA Senior Analytics Engineer technical assessment**. 
+This repository showcases a production-style analytics engineering project designed for a cross-border payments platform.
 
-The goal of this submission is to design a scalable analytics architecture and dbt transformation layer that integrates multiple operational data sources and exposes reliable business metrics through a semantic layer.
+It demonstrates how to transform raw transactional, operational, and product data into a trusted, analytics-ready data layer using dbt.
 
 ## Project Focus
 - Data modelling best practices
@@ -33,7 +33,7 @@ To review the specific deliverables for the Senior Analytics Engineer assessment
 ### 🧠 Semantic Layer
 * **[Semantic Model Definitions](dbt_project/models/semantic/semantic_models.yml)**: MetricFlow definitions for Success Rates, False Positive Rates, and Activation Funnels.
 
-## Assessment Instructions
+## Instructions
 
 The original assessment brief provided by NALA is included for reference.
 
