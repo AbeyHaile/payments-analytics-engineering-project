@@ -5,8 +5,7 @@
 
 This document defines the standards and conventions for AI coding agents (e.g. Cursor, GitHub Copilot, Gemini) interacting with this analytics engineering project.
 
-All generated or modified code must follow these guidelines to ensure consistency, maintainability, and production readiness.
----
+**All generated or modified code must adhere to these standards to ensure consistency, maintainability, and production readiness.
 
 ## 1. Core Technical Principles
 *   **Idempotency First:** Every model must be re-runnable without creating duplicate data or side effects. 
