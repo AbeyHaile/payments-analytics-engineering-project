@@ -1,7 +1,6 @@
 # End-to-End Analytics Engineering for a Payments Platform
 
-📄 Full case study: View PDF : `case_study/analytics_engineering_case_study.pdf`
-[case study](case_study/analytics_engineering_case_study.pdf)
+📄 View PDF for full [case study](case_study/analytics_engineering_case_study.pdf)
 This repository showcases a production-style analytics engineering project designed for a cross-border payments platform.
 
 It demonstrates how to transform raw transactional, operational, and product data into a trusted, analytics-ready data layer using dbt.
