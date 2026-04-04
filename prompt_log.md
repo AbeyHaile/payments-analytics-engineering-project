@@ -22,7 +22,7 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 > This project is focused on design and modelling rather than execution.
 
 **How it was used**
-- Define the scope of the project
+- Defined the scope of the project
 - Led to the inclusion of a clear note explaining why the project is not runnable
 - Ensured focus remained on architecture, modelling, and data design
 
@@ -36,7 +36,7 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 **How it was used**
 - Improved clarity and structure of the README
 - Strengthened positioning as a portfolio project rather than a task
-- Align README with engineering best practices
+- Aligned README with engineering best practices
 
 ---
 
@@ -46,8 +46,9 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 > Create an architecture document with clear sections covering data sources, transformation layers, and modelling approach.
 
 **How it was used**
-Defined structure of `docs/architecture.md`
-Introduced sections for:
+- Defined structure of `docs/architecture.md`
+- Introduced sections for:
+  
 - data sources  
 - transformation layers  
 - materialisation strategy  
