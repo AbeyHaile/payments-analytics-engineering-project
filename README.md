@@ -24,9 +24,9 @@ It demonstrates how to transform raw transactional, operational, and product dat
 ### 📊 Requirement Mapping (Models)
 | Business Requirement | Primary dbt Model |
 | :--- | :--- |
-| **1. Finance Performance** | `fct_daily_corridor_performance.sql` |
-| **2. Ops Performance** | `fct_daily_disbursement_provider_performance.sql` |
-| **3. Fincrime Ops** | `fct_daily_rule_performance.sql` |
+| **1. Finance Performance** | `fact_daily_corridor_performance.sql` |
+| **2. Ops Performance** | `fact_daily_disbursement_provider_performance.sql` |
+| **3. Fincrime Ops** | `fact_daily_rule_performance.sql` |
 | **4. Fincrime Pipeline** | `int_fincrime__task_workflow_mapping.sql` |
 | **5. Growth POC** | `dim_users.sql` |
 
