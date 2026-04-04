@@ -46,8 +46,8 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 > Create an architecture document with clear sections covering data sources, transformation layers, and modelling approach.
 
 **How it was used**
-- Defined structure of `docs/architecture.md`
-- Introduced sections for:
+Defined structure of `docs/architecture.md`
+Introduced sections for:
   
 - data sources  
 - transformation layers  
