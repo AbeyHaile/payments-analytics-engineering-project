@@ -35,12 +35,6 @@ To review the specific deliverables for the Senior Analytics Engineer assessment
 ### 🧠 Semantic Layer
 * **[Semantic Model Definitions](dbt_project/models/semantic/semantic_models.yml)**: MetricFlow definitions for Success Rates, False Positive Rates, and Activation Funnels.
 
-## Instructions
-
-See: `assessment/analytics_engineering_case_study.pdf`
-[Case study Instructions](assessment/analytics_engineering_case_study.pdf)
-
-This repository contains my proposed analytics architecture, dbt project structure, and documentation addressing the requirements outlined in the brief.
 
 ## High-Level Architecture
 The analytics layer follows a structured transformation flow to ensure data quality and lineage:
