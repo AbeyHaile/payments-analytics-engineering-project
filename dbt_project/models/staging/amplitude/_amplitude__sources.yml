@@ -14,7 +14,7 @@ models:
           - not_null
           - unique
       - name: user_id
-        description: Identifier of the NALA user associated with the event. Null for anonymous events before login or signup.
+        description: Identifier of the user associated with the event. Null for anonymous events before login or signup.
       - name: device_id
         description: Unique device identifier associated with the event.
         data_tests:
@@ -33,6 +33,9 @@ models:
         description: Raw JSON object containing user attributes at the time of the event.
       - name: platform
         description: Client platform that generated the event.
+        data_tests:
+          - accepted_values:
+              values: ['iOS', 'Android', 'Web']
       - name: os_name
         description: Operating system name of the client device.
       - name: country
@@ -40,7 +43,7 @@ models:
       - name: city
         description: City derived from IP geolocation.
       - name: app_version
-        description: Version of the NALA app that generated the event.
+        description: Version of the app that generated the event.
       - name: session_id
         description: Session identifier grouping events within a single app session.
       - name: server_upload_time

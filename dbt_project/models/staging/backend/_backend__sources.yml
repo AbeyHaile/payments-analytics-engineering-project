@@ -440,8 +440,6 @@ models:
               field: account_id
       - name: created_at
         description: Timestamp when the recipient record was created.
-      - name: provider_name
-        description: Name of the payout provider associated with the recipient.
       - name: recipient_type
         description: Type of recipient destination.
         data_tests:

@@ -22,7 +22,7 @@ WITH transactions AS (
 
     {% if is_incremental() %}
         WHERE updated_at >= (
-            SELECT DATEADD('day', -3, MAX(transaction_created_at))
+            SELECT DATEADD('day', -3, MAX(transaction_updated_at))
             FROM {{ this }}
         )
     {% endif %}
@@ -52,7 +52,8 @@ recipient_accounts AS (
 SELECT
     t.transaction_id,
     DATE(t.created_at) AS metric_date,
-    t.updated_at,
+    t.created_at AS transaction_created_at,
+    t.updated_at AS transaction_updated_at,
     u.sender_country AS source_country,
     ra.country AS destination_country,
     CONCAT(u.sender_country, '-', ra.country) AS corridor,
@@ -62,7 +63,14 @@ SELECT
     t.sent_currency,
     t.received_amount,
     t.received_currency,
-    t.created_at AS transaction_created_at
+    CASE
+        WHEN t.transaction_type in (
+            'DISBURSEMENT',
+            'CONVERSION_DISBURSEMENT',
+            'COLLECTION_CONVERSION_DISBURSEMENT'
+        ) THEN 1
+        ELSE 0
+    END AS is_volume_qualifying
 FROM 
     transactions t
 LEFT JOIN users u

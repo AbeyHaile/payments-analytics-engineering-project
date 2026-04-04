@@ -17,7 +17,7 @@ WITH backend_users AS (
 
     {% if is_incremental() %}
         WHERE created_at >= (
-            SELECT DATEADD('day', -3, MAX(signed_up_at))
+            SELECT DATEADD('day', -3, GREATEST(signed_up_at, COALESCE(kyc_approved_at, signed_up_at)))
             FROM {{ this }})
     {% endif %}
 
