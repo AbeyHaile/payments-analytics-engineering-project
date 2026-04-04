@@ -35,8 +35,6 @@ To review the specific deliverables for the Senior Analytics Engineer assessment
 
 ## Instructions
 
-The original assessment brief provided by NALA is included for reference.
-
 See: `assessment/analytics_engineering_case_study.pdf`
 [Case study Instructions](assessment/analytics_engineering_case_study.pdf)
 
@@ -78,11 +76,11 @@ The architecture integrates three primary operational systems:
 
 ## Repository Structure
 ```text
-nala-analytics-assessment/
+payments-analytics-engineering-project/
 ├── README.md
 ├── .gitignore
 ├── assessment/
-│   └── nala_assessment_instructions.pdf
+│   └── analytics_engineering_case_study.pdf
 ├── docs/
 │   ├── architecture.md
 │   ├── source_to_target_mapping.md
