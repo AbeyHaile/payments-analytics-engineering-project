@@ -73,7 +73,7 @@ The architecture integrates three primary operational systems:
 payments-analytics-engineering-project/
 ├── README.md
 ├── .gitignore
-├── assessment/
+├── case_study/
 │   └── analytics_engineering_case_study.pdf
 ├── docs/
 │   ├── architecture.md
