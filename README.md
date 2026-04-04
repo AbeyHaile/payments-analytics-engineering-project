@@ -16,8 +16,6 @@ It demonstrates how to transform raw transactional, operational, and product dat
 ---
 ## 🗺️ Project Navigation
 
-To review the specific deliverables for the Senior Analytics Engineer assessment, please use the links below:
-
 ### 📖 Documentation & Strategy
 * **[Architecture Decision Log](docs/architecture.md)**: Detailed reasoning for Snowflake provisioning, `delete+insert` incremental strategies, and the 3-day lookback logic.
 * **[AI Agent Handbook (AGENTS.md)](agent.md)**: Operational instructions and standards for AI agents interacting with this repository.
