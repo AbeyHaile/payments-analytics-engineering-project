@@ -7,11 +7,11 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 ## 1. Repository and Deliverables Structure
 
 **Prompt**
-> I want to structure this project as a GitHub repo with clear separtion between dbt models, documentation, and supporting materials.
+> I want to structure this project as a GitHub repo with clear separation between dbt models, documentation, and supporting materials.
 > Do not introduce assumptions that contradict the source material unless explicitly instructed.
 
 **How it was used**
-- Helped define the initial repository structure and separate documentation from dbt assets
+- Defined the repository structure and separation between dbt models and documentation.
 - Led to the creation of: `architecture.md`, `source_to_target_mapping.md`, and `prompt_log.md`
 
 ---
@@ -22,7 +22,7 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 > This project is focused on design and modelling rather than execution.
 
 **How it was used**
-- Helped define the scope of the project
+- Define the scope of the project
 - Led to the inclusion of a clear note explaining why the project is not runnable
 - Ensured focus remained on architecture, modelling, and data design
 
@@ -36,7 +36,7 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 **How it was used**
 - Improved clarity and structure of the README
 - Strengthened positioning as a portfolio project rather than a task
-- Helped align README with engineering best practices
+- Align README with engineering best practices
 
 ---
 
@@ -46,14 +46,13 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 > Create an architecture document with clear sections covering data sources, transformation layers, and modelling approach.
 
 **How it was used**
-- Defined structure of `docs/architecture.md`
-- Introduced sections for:
- 
- data sources
- transformation layers
- materialisation strategy
- orchestration
- testing approach
+Defined structure of `docs/architecture.md`
+Introduced sections for:
+- data sources  
+- transformation layers  
+- materialisation strategy  
+- orchestration  
+- testing approach  
 ---
 
 ## 5. Source-to-Target Mapping Design
@@ -129,4 +128,11 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 
 ---
 
+## 🎯 Key Takeaway
 
+AI was used as a collaborative assistant rather than a source of truth.
+
+All outputs were reviewed, validated, and adapted to ensure alignment with:
+- business requirements  
+- data modelling best practices  
+- production-grade standards  
