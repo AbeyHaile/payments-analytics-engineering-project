@@ -47,6 +47,7 @@ It reflects an AI-assisted workflow, where outputs were reviewed, validated, and
 
 **How it was used**
 Defined structure of `docs/architecture.md`
+
 Introduced sections for:
   
 - data sources  
