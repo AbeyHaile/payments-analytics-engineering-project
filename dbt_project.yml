@@ -1,7 +1,7 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models.
-name: 'nala_analytics_assessment'
+name: 'payments_analytics_engineering'
 version: '1.0.0'
 
 # Select the dbt profile used for the project.
@@ -28,7 +28,7 @@ clean-targets:
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
 models:
-  nala_analytics_assessment:
+  payments_analytics_engineering:
     # Config indicated by + and applies to all files under models/staging/
     staging:
       +materialized: view
