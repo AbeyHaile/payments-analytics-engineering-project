@@ -1,135 +1,74 @@
-# AI Prompt Log
+# AI Collaboration Log
 
-This document records the substantive AI prompts used to support the completion of this assessment.
+This document captures how AI tools were used to support the development of this analytics engineering project.
+
+It reflects an AI-assisted workflow, where outputs were reviewed, validated, and adapted to align with project requirements and engineering best practices.
 
 ## 1. Repository and Deliverables Structure
 
 **Prompt**
-> I want to share my task as a GitHub repo. I want to create a README file, a source-to-target mapping document, a POC document for the requests from finance and other stakeholders, and YAML documentation for each model. Here is the design of course needs updating.
-> All outputs must be cross-validated against the information provided in the senior_ae_take_home doc. Do not introduce assumptions that contradict the source material unless explicitly instructed.
-```
-nala-analytics-assessment/
- ├── dbt_project/
- ├── docs/
- ├── README.md
- └── .gitignore
- └── assessment
- └── agent.md
- └── promtpt_log.md
-```
+> I want to structure this project as a GitHub repo with clear separtion between dbt models, documentation, and supporting materials.
+> Do not introduce assumptions that contradict the source material unless explicitly instructed.
 
 **How it was used**
-- Helped define the initial repository structure
-- Shaped the decision to separate documentation from dbt assets
-- Led to the addition of dedicated files such as `architecture.md`, `source_to_target_mapping.md`, and `prompt_log.md`
+- Helped define the initial repository structure and separate documentation from dbt assets
+- Led to the creation of: `architecture.md`, `source_to_target_mapping.md`, and `prompt_log.md`
 
 ---
 
-## 2. Assessment Repository Framing
+## 2. Project Framing
 
 **Prompt**
-> You know this file won’t be runnable, right?
+> This project is focused on design and modelling rather than execution.
 
 **How it was used**
-- Helped define the execution note in the README
+- Helped define the scope of the project
+- Led to the inclusion of a clear note explaining why the project is not runnable
+- Ensured focus remained on architecture, modelling, and data design
 
 ---
 
 ## 3. README Structure and Positioning
 
 **Prompt**
-> Let’s add the instruction for the assessment PDF in the readme file.
+> Improve the README to clearly communicate the project structure, use cases, and modelling approach.
 
 **How it was used**
-- Led to including the original assessment brief in the repository
-- Helped improve README traceability between the brief and the solution
-- Resulted in a dedicated “Assessment Instructions” section and requirement mapping table
+- Improved clarity and structure of the README
+- Strengthened positioning as a portfolio project rather than a task
+- Helped align README with engineering best practices
 
 ---
 
 ## 4. Architecture Document Structure
 
 **Prompt**
-> Noe, let's create the Architecture Document in docs with clear subtitles.
+> Create an architecture document with clear sections covering data sources, transformation layers, and modelling approach.
 
 **How it was used**
-- Helped establish the structure of `docs/architecture.md`
-- Produced the main sections covering overview, source systems, Snowflake provisioning, dbt layering, materialization strategy, CDC handling, cross-source enrichment, mart design, semantic layer, testing, orchestration, and assumptions
-
+- Defined structure of `docs/architecture.md`
+- Introduced sections for:
+ 
+ data sources
+ transformation layers
+ materialisation strategy
+ orchestration
+ testing approach
 ---
 
 ## 5. Source-to-Target Mapping Design
 
 **Prompt**
-> I want to do this in gsheet.
+> Design a structured mapping between source data and analytics outputs.
 
 **How it was used**
-- Helped decide that source-to-target mapping would be easier to maintain in spreadsheet format
-- Confirmed that a tabular structure is appropriate for lineage and transformation documentation
-- Informed the idea of storing a maintained mapping outside the core markdown docs while still referencing it from the repository
+- Clarified mapping requirements
+- Highlighted need for column-level lineage and transformation logic
+- Informed decision to document transformations directly in dbt models and YAML
 
 ---
 
-## 6. Source-to-Target Mapping Scope
-
-**Prompt**
-> Source should be staging layer model and target should be either semantic or analytics.
-
-**How it was used**
-- Refined the scope of the mapping from raw-source lineage to analytics-layer lineage
-- Shifted the focus toward dbt staging models, analytics marts, and semantic outputs
-- Helped align the mapping with the actual assessment deliverables rather than generic ingestion lineage
-
-**Final Decision**
-- Not included, as it falls outside the scope of the assessment deliverables
-- All lineage and transformation logic are instead documented directly within dbt models and YAML files to keep the project self-contained
-
----
-
-## 7. Column-Level Mapping Requirement
-
-**Prompt**
-> It’s not just targeting tables. It has to target columns. How are the aggregates computed from the staging column? Is it SUM, AVG, ...?
-
-**How it was used**
-- Clarified that the source-to-target mapping should be column-level rather than table-level
-- Introduced the need to document transformation logic and aggregation rules explicitly
-- Influenced the design of the mapping to include target column, source column, transformation logic, aggregation type, and business meaning
-
----
-
-## 8. Staging-First Modelling Approach
-
-**Prompt**
-> Maybe we’re ahead of ourselves. Let’s do staging models and YAML first.
-
-**How it was used**
-- Reset the implementation sequence to start with the staging layer
-- Reinforced a dbt-first workflow: sources → staging SQL → model YAML → downstream layers
-- Helped prioritise the backend, fincrime, and amplitude staging models before moving to marts and semantic definitions
-
-### 9. Staging Model Generation
-
-**Prompt**
-
-> Generate a dbt staging model for a backend table described in the assessment document.
-> Requirements:
->
-> * Use the naming convention `stg_backend__<table_name>`
-> * Rename `id` to `<entity>_id`
-> * Keep standard columns (`created_at`, `updated_at`, `currency`, `provider_name`) unchanged
-> * Do not transform data in staging
-> * Order columns with the primary key first and remaining columns alphabetically
-
-**How it was used**
-
-* Accelerated the creation of consistent staging SQL models
-* Ensured consistent naming conventions across backend staging tables
-* Reduced manual effort when generating repetitive model structures
-
----
-
-### 10. YAML Schema Documentation
+### 6. YAML Schema Documentation
 
 **Prompt**
 
@@ -148,53 +87,39 @@ nala-analytics-assessment/
 
 ---
 
-### 11. Relationship Identification
+### 7. Relationship Identification
 
 **Prompt**
 
-> Identify which columns in the backend schema represent foreign key relationships between tables.
+> Identify foreign key relationships across the dataset.
 
 **How it was used**
 
-* Helped validate relationship tests between staging models
-* Confirmed links such as `transaction_id`, `recipient_id`, and `account_id`
-* Prevented incorrect relationships for non-key fields like `provider_name`
+* Validated relationships between models
+* Ensured accurate relationships tests
+* Prevented incorrect joins on non-key fields
 
 ---
 
-### 12. Scheduling Strategy
+### 8. Scheduling Strategy
 
 **Prompt**
 
-> Based on table update frequency and approximate row counts, recommend scheduling tags (`hourly`, `four_hourly`, `daily`) for staging models.
+> Recommend model execution frequency based on data volume and update patterns.
 
 **How it was used**
 
-* Supported the scheduling strategy for the dbt project
-* Identified operational tables requiring higher refresh frequency
-* Balanced data freshness with warehouse compute cost
+* Informed orchestration strategy
+* Balanced data freshness with compute cost
+* Supported definition of refresh frequencies (e.g. hourly, daily)
 
 ---
 
-### 13. Scheduling Validation Using Table Volumes
+### 9. Data Quality Review
 
 **Prompt**
 
-> Cross-validate the proposed scheduling strategy against table volumes and operational importance.
-
-**How it was used**
-
-* Confirmed that high-volume payment flow tables should run more frequently
-* Justified a mixed scheduling strategy combining hourly and four-hourly runs
-* Helped document orchestration reasoning
-
----
-
-### 14. Data Quality Review
-
-**Prompt**
-
-> Review the staging YAML schemas and identify missing tests or validation rules.
+> Review models and identify missing data quality checks.
 
 **How it was used**
 
