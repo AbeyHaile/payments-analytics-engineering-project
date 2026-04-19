@@ -1,8 +1,13 @@
 # AI Collaboration Log
 
-This document captures how AI tools were used to support the development of this analytics engineering project.
+## AI Usage Principles
 
-It reflects an AI-assisted workflow, where outputs were reviewed, validated, and adapted to align with project requirements and engineering best practices.
+AI was used under strict constraints to ensure outputs remained aligned with production-grade analytics engineering standards:
+
+- Outputs were treated as drafts and never accepted without validation
+- All generated logic was reviewed against defined modelling standards (grain, joins, incremental logic)
+- AI was not permitted to introduce new assumptions beyond provided requirements
+- Final implementations were manually verified for correctness, performance, and consistency
 
 ## 1. Repository and Deliverables Structure
 
@@ -82,7 +87,7 @@ Introduced sections for:
 
 **How it was used**
 
-* Assisted in generating YAML schema files for each staging model
+* Generated initial YAML schema files, which were then reviewed and refined to ensure completeness and adherence to testing standards
 * Ensured consistent documentation format across the project
 * Helped identify missing validation tests
 
@@ -124,7 +129,7 @@ Introduced sections for:
 
 **How it was used**
 
-* Helped ensure enum columns include `accepted_values`
+* Validated that enum columns include accepted_values tests and corrected any inconsistencies
 * Verified that primary keys include `not_null` and `unique` tests
 * Identified missing relationship validations between models
 
@@ -132,9 +137,11 @@ Introduced sections for:
 
 ## 🎯 Key Takeaway
 
-AI was used as a collaborative assistant rather than a source of truth.
+AI was used as a controlled assistant to accelerate development, not as a source of truth.
 
-All outputs were reviewed, validated, and adapted to ensure alignment with:
+All outputs were critically reviewed, validated, and adapted to ensure alignment with:
 - business requirements  
-- data modelling best practices  
-- production-grade standards  
+- data modelling principles (grain, joins, incremental logic)  
+- production-grade analytics engineering standards  
+
+The final implementation reflects deliberate engineering decisions rather than generated outputs.
