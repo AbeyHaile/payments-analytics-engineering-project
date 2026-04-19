@@ -13,6 +13,15 @@ It demonstrates how to transform raw transactional, operational, and product dat
 - Implementing production-grade dbt structure with incremental logic and data quality checks
 
 ---
+
+## Key Design Decisions
+
+- **Incremental Strategy**: `delete+insert` with a 3-day lookback to handle late-arriving updates in asynchronous payment workflows  
+- **Grain Definition**: Daily corridor-level aggregation to balance performance and analytical flexibility  
+- **Surrogate Keys**: Deterministic hash keys used to ensure idempotent loads and efficient joins  
+- **Cross-System Joins**: Transaction-level matching with fallback to user-level, using window functions to preserve the most granular relationship  
+- **Semantic Layer Design**: Metrics defined as ratios of measures to ensure correct aggregation across dimensions
+  
 ## 🗺️ Project Navigation
 
 ### 📖 Documentation & Strategy
