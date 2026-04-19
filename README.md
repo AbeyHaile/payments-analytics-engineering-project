@@ -7,11 +7,10 @@ This repository showcases a production-style analytics engineering project desig
 It demonstrates how to transform raw transactional, operational, and product data into a trusted, analytics-ready data layer using dbt.
 
 ## Project Focus
-- Data modelling best practices
-- Clear separation of transformation layers
-- Documentation of assumptions and architecture
-- Traceability between requirements and implementation
-- Production-ready dbt project structure
+- Designing analytics-ready data models with clear grain and ownership
+- Enabling reliable performance monitoring across payment corridors and providers
+- Supporting experimentation and operational decision-making with trusted metrics
+- Implementing production-grade dbt structure with incremental logic and data quality checks
 
 ---
 ## 🗺️ Project Navigation
